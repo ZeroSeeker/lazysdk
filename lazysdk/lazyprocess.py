@@ -16,7 +16,7 @@ os_cpu_count = os.cpu_count()  # CPU核心数
 
 def run(
         task_list: list,
-        task_function_name: str = 'task_function',
+        task_function,
         subprocess_keep: bool = False,
         subprocess_limit: int = os_cpu_count * 2,
         master_process_delay: int = 1,
@@ -26,7 +26,7 @@ def run(
     """
     多进程 进程控制
     :param task_list: 任务列表，list格式
-    :param task_function_name: 子任务的function名称，需提前写好，入参为：(task_index, task_info)，例如：task_function(task_index, task_info)
+    :param task_function: 子任务的function，需提前写好，入参为：(task_index, task_info)，例如：task_function(task_index, task_info)
     :param subprocess_keep: 是否保持子进程，True为保持进程，死掉会自动重启；False为不保持，自然退出
     :param subprocess_limit: 进程数限制，0为无限制，否则按照设定的数量限制并行的子进程数量
     :param master_process_delay: 主进程循环延时，单位为秒，默认为1秒
@@ -67,7 +67,7 @@ def run(
                 task_info = task_list[task_index]  # 提取将开启的进程的任务内容
                 # ---------- 开启进程 ----------
                 p = Process(
-                    target=eval(task_function_name),
+                    target=task_function,
                     args=(task_index, task_info)
                 )
                 p.start()
