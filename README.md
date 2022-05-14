@@ -42,3 +42,6 @@ lazysdk.lazyprocess.run(
     subprocess_limit=2
 )
 ```
+
+## Links
+- PyPI Releases: https://pypi.org/project/lazysdk/
