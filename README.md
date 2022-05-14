@@ -1,7 +1,7 @@
-# lazyprocess
+# lazysdk
 
 #### 介绍
-python的一种多进程的子进程管理方法
+基于Python的懒人包
 
 #### 软件架构
 软件架构说明
