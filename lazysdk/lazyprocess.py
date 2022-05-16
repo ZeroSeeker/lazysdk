@@ -97,5 +97,5 @@ def run(
             if subprocess_keep is True:
                 task_index_start = 0  # 将累计启动进程数重置为0
             else:
-                break
+                return
         time.sleep(master_process_delay)
