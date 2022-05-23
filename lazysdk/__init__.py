@@ -7,3 +7,4 @@
 @ Gitee : https://gitee.com/ZeroSeeker
 """
 from . import lazyprocess
+from . import lazyrequests
