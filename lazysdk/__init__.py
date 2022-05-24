@@ -8,3 +8,4 @@
 """
 from . import lazyprocess
 from . import lazyrequests
+from . import lazybase64
