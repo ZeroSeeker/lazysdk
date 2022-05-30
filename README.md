@@ -10,6 +10,9 @@
 - lazysdk.lazyprocess
   - 多进程控制
 
+- lazysdk.lazywebhook
+  - webhook推送
+  
 #### 安装教程
 1.  使用pip安装
 - 普通方式安装
@@ -25,7 +28,7 @@ pip3 install lazysdk -i https://mirrors.aliyun.com/pypi/simple
 #### 使用说明
 
 1. lazyprocess
-```python
+```python3
 import lazysdk
 
 task_list = [1,2,3,4,5,6,7,8]
@@ -42,6 +45,17 @@ lazysdk.lazyprocess.run(
     subprocess_limit=2
 )
 ```
+
+2. lazywebhook
+- 目前仅支持企业微信
+```python3
+from lazysdk import lazywebhook
+    
+lazywebhook.send_text(
+    webhook='webhook url'
+)
+```
+
 
 ## Links
 - PyPI Releases: https://pypi.org/project/lazysdk/
