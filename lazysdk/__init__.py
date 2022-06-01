@@ -9,3 +9,5 @@
 from . import lazyprocess
 from . import lazyrequests
 from . import lazybase64
+from . import lazytime
+from . import lazywebhook
