@@ -19,9 +19,22 @@ default_env_file_name = 'local.redis.env'  # 默认链接信息文件
 集合层叫name
 下一层hash的叫key,value
 
+全局默认解码(decode_responses=True)
+
 redis的基本用法可以参考：https://www.runoob.com/redis
 
 python的redis用法可以参考：https://www.runoob.com/w3cnote/python-redis-intro.html
+
+返回：
+    {
+        "code": 0,
+        "msg": "ok",
+        "data": <返回的数据>/None
+    }
+    
+    code=0为正常，code!=0为异常，msg参数为原因
+    
+    code=1为未知错误
 """
 
 
@@ -33,7 +46,8 @@ class Basics:
             host=None,  # 连接的域名
             port=None,  # 连接的端口
             password=None,  # 连接的密码,
-            max_connections=None
+            max_connections=None,
+            decode_responses=True
     ):
         # 初始化所有参数
         if con_info is not None:
@@ -42,6 +56,7 @@ class Basics:
             self.port = con_info.get('port', 6379)
             self.pwd = con_info.get('password')
             self.max_connections = con_info.get('max_connections')
+            self.decode_responses = con_info.get('decode_responses', True)
         else:
             if db is None:
                 self.con_db = 0
@@ -51,6 +66,7 @@ class Basics:
             self.port = port
             self.pwd = password
             self.max_connections = max_connections
+            self.decode_responses = decode_responses
         self.pool = self.make_connect_pool()
         self.conn = self.connect()
 
@@ -64,7 +80,7 @@ class Basics:
             password=self.pwd,
             db=self.con_db,
             max_connections=self.max_connections,
-            decode_responses=True
+            decode_responses=self.decode_responses
         )
         return pool
 
@@ -108,7 +124,6 @@ class Basics:
 
     def get_db_key_list(
             self,
-            decode: bool = True,  # 返回内容解码
             auto_reconnect: bool = True,  # 自动重连
             reconnect_delay: int = 1  # 重连延时，单位为秒
     ):
@@ -119,21 +134,11 @@ class Basics:
         while True:
             try:
                 inner_keys = list(self.conn.keys())
-                if decode is False:
-                    return {
-                        "code": 0,
-                        "msg": "ok",
-                        "data": inner_keys
-                    }
-                else:
-                    key_list = list()
-                    for key in inner_keys:
-                        key_list.append(key.decode())
-                    return {
-                        "code": 0,
-                        "msg": "ok",
-                        "data": key_list
-                    }
+                return {
+                    "code": 0,
+                    "msg": "ok",
+                    "data": inner_keys
+                }
             except redis.exceptions.ConnectionError as e:
                 if auto_reconnect is True:
                     showlog.warning(f'连接失败，将在{reconnect_delay}秒后重连...')
@@ -205,7 +210,6 @@ class Basics:
     def list_read_first_value(
             self,
             key,
-            decode: bool = True,  # 返回内容解码
             auto_reconnect: bool = True,  # 自动重连
             reconnect_delay: int = 1  # 重连延时，单位为秒
     ):
@@ -214,26 +218,11 @@ class Basics:
         """
         while True:
             try:
-                if decode is False:
-                    return {
-                        "code": 0,
-                        "msg": "ok",
-                        "data": self.conn.lindex(key, 0)
-                    }
-                else:
-                    source_value = self.conn.lindex(key, 0)
-                    if source_value is None:
-                        return {
-                            "code": 0,
-                            "msg": "ok",
-                            "data": source_value
-                        }
-                    else:
-                        return {
-                            "code": 0,
-                            "msg": "ok",
-                            "data": source_value.decode()
-                        }
+                return {
+                    "code": 0,
+                    "msg": "ok",
+                    "data": self.conn.lindex(key, 0)
+                }
             except redis.exceptions.ConnectionError as e:
                 if auto_reconnect is True:
                     showlog.warning(f'连接失败，将在{reconnect_delay}秒后重连...')
@@ -249,7 +238,6 @@ class Basics:
     def list_read_last_value(
             self,
             key,
-            decode: bool = True,  # 返回内容解码
             auto_reconnect: bool = True,  # 自动重连
             reconnect_delay: int = 1  # 重连延时，单位为秒
     ):
@@ -258,26 +246,11 @@ class Basics:
         """
         while True:
             try:
-                if decode is False:
-                    return {
-                        "code": 0,
-                        "msg": "ok",
-                        "data": self.conn.lindex(key, -1)
-                    }
-                else:
-                    source_value = self.conn.lindex(key, -1)
-                    if source_value is None:
-                        return {
-                            "code": 0,
-                            "msg": "ok",
-                            "data": source_value
-                        }
-                    else:
-                        return {
-                            "code": 0,
-                            "msg": "ok",
-                            "data": source_value.decode()
-                        }
+                return {
+                    "code": 0,
+                    "msg": "ok",
+                    "data": self.conn.lindex(key, -1)
+                }
             except redis.exceptions.ConnectionError as e:
                 if auto_reconnect is True:
                     showlog.warning(f'连接失败，将在{reconnect_delay}秒后重连...')
@@ -351,7 +324,6 @@ class Basics:
     def list_pop_l(
             self,
             key,
-            decode: bool = True,  # 返回内容解码
             auto_reconnect: bool = True,  # 自动重连
             reconnect_delay: int = 1  # 重连延时，单位为秒
     ):
@@ -360,20 +332,13 @@ class Basics:
         """
         while True:
             try:
-                key_type = self.conn.type(key).decode()
+                key_type = self.conn.type(key)
                 if key_type == 'list':
-                    if decode is False:
-                        return {
-                            "code": 0,
-                            "msg": "ok",
-                            "data": self.conn.lpop(key)
-                        }
-                    else:
-                        return {
-                            "code": 0,
-                            "msg": "ok",
-                            "data": self.conn.lpop(key).decode()
-                        }
+                    return {
+                        "code": 0,
+                        "msg": "ok",
+                        "data": self.conn.lpop(key)
+                    }
                 else:
                     return {
                         "code": 2,
@@ -395,7 +360,6 @@ class Basics:
     def list_pop_r(
             self,
             key,
-            decode: bool = True,  # 返回内容解码
             auto_reconnect: bool = True,  # 自动重连
             reconnect_delay: int = 1  # 重连延时，单位为秒
     ):
@@ -404,18 +368,11 @@ class Basics:
         """
         while True:
             try:
-                if decode is False:
-                    return {
-                        "code": 0,
-                        "msg": "ok",
-                        "data": self.conn.rpop(key)
-                    }
-                else:
-                    return {
-                        "code": 0,
-                        "msg": "ok",
-                        "data": self.conn.rpop(key).decode()
-                    }
+                return {
+                    "code": 0,
+                    "msg": "ok",
+                    "data": self.conn.rpop(key)
+                }
             except redis.exceptions.ConnectionError as e:
                 if auto_reconnect is True:
                     showlog.warning(f'连接失败，将在{reconnect_delay}秒后重连...')
@@ -467,25 +424,17 @@ class Basics:
     def set_get(
             self,
             name,
-            decode: bool = True,  # 返回内容解码
             auto_reconnect: bool = True,  # 自动重连
             reconnect_delay: int = 1  # 重连延时，单位为秒
     ):
         # 获取键值
         while True:
             try:
-                if decode is False:
-                    return {
-                        "code": 0,
-                        "msg": "ok",
-                        "data": self.conn.get(name)
-                    }
-                else:
-                    return {
-                        "code": 0,
-                        "msg": "ok",
-                        "data": self.conn.get(name).decode()
-                    }
+                return {
+                    "code": 0,
+                    "msg": "ok",
+                    "data": self.conn.get(name)
+                }
             except redis.exceptions.ConnectionError as e:
                 if auto_reconnect is True:
                     showlog.warning(f'连接失败，将在{reconnect_delay}秒后重连...')
@@ -563,29 +512,17 @@ class Basics:
     def count_read(
             self,
             key,
-            decode: bool = True,  # 返回内容解码
             auto_reconnect: bool = True,  # 自动重连
             reconnect_delay: int = 1  # 重连延时，单位为秒
     ):
         # 键 计数 获取值
         while True:
             try:
-                if decode is False:
-                    return self.conn.get(key)
-                else:
-                    count_value = self.conn.get(key)
-                    if count_value is None:
-                        return {
-                            "code": 0,
-                            "msg": "ok",
-                            "data": count_value
-                        }
-                    else:
-                        return {
-                            "code": 0,
-                            "msg": "ok",
-                            "data": count_value.decode()
-                        }
+                return {
+                    "code": 0,
+                    "msg": "ok",
+                    "data": self.conn.get(key)
+                }
             except redis.exceptions.ConnectionError as e:
                 if auto_reconnect is True:
                     showlog.warning(f'连接失败，将在{reconnect_delay}秒后重连...')
@@ -671,7 +608,6 @@ class Basics:
     def hash_keys(
             self,
             name,
-            decode: bool = True,  # 返回内容解码
             auto_reconnect: bool = True,  # 自动重连
             reconnect_delay: int = 1  # 重连延时，单位为秒
     ):
@@ -680,27 +616,11 @@ class Basics:
         """
         while True:
             try:
-                if decode is None:
-                    return {
-                        "code": 0,
-                        "msg": "ok",
-                        "data": self.conn.hkeys(name=name)
-                    }
-                else:
-                    res = self.conn.hkeys(
-                        name=name
-                    )
-                    hkeys_list = list()
-                    for each in res:
-                        if each is not None:
-                            hkeys_list.append(each.decode())
-                        else:
-                            hkeys_list.append(each)
-                    return {
-                        "code": 0,
-                        "msg": "ok",
-                        "data": hkeys_list
-                    }
+                return {
+                    "code": 0,
+                    "msg": "ok",
+                    "data": self.conn.hkeys(name=name)
+                }
             except redis.exceptions.ConnectionError as e:
                 if auto_reconnect is True:
                     showlog.warning(f'连接失败，将在{reconnect_delay}秒后重连...')
@@ -717,7 +637,6 @@ class Basics:
             self,
             name,
             key,
-            decode: bool = True,  # 返回内容解码
             auto_reconnect: bool = True,  # 自动重连
             reconnect_delay: int = 1  # 重连延时，单位为秒
     ):
@@ -726,29 +645,11 @@ class Basics:
         """
         while True:
             try:
-                if decode is False:
-                    return {
-                        "code": 0,
-                        "msg": "ok",
-                        "data": self.conn.hget(name=name, key=key)
-                    }
-                else:
-                    data_source = self.conn.hget(
-                        name=name,
-                        key=key
-                    )
-                    if data_source is None:
-                        return {
-                            "code": 0,
-                            "msg": "ok",
-                            "data": data_source
-                        }
-                    else:
-                        return {
-                            "code": 0,
-                            "msg": "ok",
-                            "data": data_source.decode()
-                        }
+                return {
+                    "code": 0,
+                    "msg": "ok",
+                    "data": self.conn.hget(name=name, key=key)
+                }
             except redis.exceptions.ConnectionError as e:
                 if auto_reconnect is True:
                     showlog.warning(f'连接失败，将在{reconnect_delay}秒后重连...')
@@ -765,7 +666,6 @@ class Basics:
             self,
             name,
             key_list: list,
-            decode: bool = True,  # 返回内容解码
             auto_reconnect: bool = True,  # 自动重连
             reconnect_delay: int = 1  # 重连延时，单位为秒
     ):
@@ -775,31 +675,14 @@ class Basics:
         """
         while True:
             try:
-                if decode is False:
-                    return {
-                        "code": 0,
-                        "msg": "ok",
-                        "data": self.conn.hmget(
-                            name=name,
-                            keys=key_list
-                        )
-                    }
-                else:
-                    res_list = list()
-                    data_source = self.conn.hmget(
+                return {
+                    "code": 0,
+                    "msg": "ok",
+                    "data": self.conn.hmget(
                         name=name,
                         keys=key_list
                     )
-                    for each in data_source:
-                        if each is None:
-                            res_list.append(each)
-                        else:
-                            res_list.append(each.decode())
-                    return {
-                        "code": 0,
-                        "msg": "ok",
-                        "data": res_list
-                    }
+                }
             except redis.exceptions.ConnectionError as e:
                 if auto_reconnect is True:
                     showlog.warning(f'连接失败，将在{reconnect_delay}秒后重连...')
@@ -815,7 +698,6 @@ class Basics:
     def hash_get_all(
             self,
             name,
-            decode: bool = True,  # 返回内容解码
             auto_reconnect: bool = True,  # 自动重连
             reconnect_delay: int = 1  # 重连延时，单位为秒
     ):
@@ -823,7 +705,6 @@ class Basics:
         Redis Hgetall 命令用于返回哈希表中，所有的字段和值。
         在返回值里，紧跟每个字段名(field name)之后是字段的值(value)，所以返回值的长度是哈希表大小的两倍。
         """
-        res_list = dict()
         while True:
             try:
                 key_type = self.conn.type(name=name)
@@ -833,37 +714,18 @@ class Basics:
                         "msg": "type is None",
                         "data": None
                     }
-                elif 'hash' not in key_type.decode():
+                elif 'hash' not in key_type:
                     return {
                         "code": 1,
                         "msg": "type is not hash",
                         "data": None
                     }
                 else:
-                    if decode is False:
-                        return {
-                            "code": 0,
-                            "msg": "ok",
-                            "data": self.conn.hgetall(name=name)
-                        }
-                    else:
-                        data_source = self.conn.hgetall(
-                            name=name
-                        )
-                        if data_source is None:
-                            return {
-                                "code": 0,
-                                "msg": "ok",
-                                "data": res_list
-                            }
-                        else:
-                            for each_key, each_value in data_source.items():
-                                res_list[each_key.decode()] = each_value.decode()
-                            return {
-                                "code": 0,
-                                "msg": "ok",
-                                "data": res_list
-                            }
+                    return {
+                        "code": 0,
+                        "msg": "ok",
+                        "data": self.conn.hgetall(name=name)
+                    }
             except redis.exceptions.ConnectionError as e:
                 if auto_reconnect is True:
                     showlog.warning(f'连接失败，将在{reconnect_delay}秒后重连...')
@@ -904,6 +766,7 @@ def make_con_info(
             "port": int(inner_env.get('port', '6379')),
             "password": inner_env.get('password'),
             "max_connections": max_connections,
+            "decode_responses": inner_env.get('decode_responses', True)
         }
         return con_info
 
@@ -912,7 +775,6 @@ def get_db_key_list(
         db: int = default_db,
         con_info: dict = None,  # 若指定，将优先使用
         env_file_name: str = default_env_file_name,
-        decode: bool = True,  # 返回内容解码
         auto_reconnect: bool = True,  # 自动重连
         reconnect_delay: int = 1  # 重连延时，单位为秒
 ):
@@ -930,7 +792,6 @@ def get_db_key_list(
         con_info=con_info
     )
     return basics.get_db_key_list(
-        decode=decode,
         auto_reconnect=auto_reconnect,
         reconnect_delay=reconnect_delay
     )
@@ -1354,7 +1215,6 @@ def hash_get_all(
         con_info: dict = None,  # 若指定，将优先使用
         env_file_name: str = default_env_file_name,
         auto_reconnect: bool = True,  # 自动重连
-        decode: bool = True
 ) -> dict:
     """
     获取hash的所有键的值
@@ -1364,7 +1224,6 @@ def hash_get_all(
     :param con_info: 连接信息
     :param env_file_name: 环境文件名
     :param auto_reconnect: 是否自动重连，默认为True
-    :param decode: 是否对结果解码，默认为True
     """
     # ---------------- 固定设置 ----------------
     if con_info is None:
@@ -1378,6 +1237,5 @@ def hash_get_all(
     )
     return basics.hash_get_all(
         name=name,
-        auto_reconnect=auto_reconnect,
-        decode=decode
+        auto_reconnect=auto_reconnect
     )
