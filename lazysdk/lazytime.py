@@ -185,6 +185,7 @@ def get_relative_datetime(
         f: str = '%Y-%m-%d %H:%M:%S'
 ):
     """
+    【计划弃用】
     获取当前系统当前时间的相对时间：日期，num为0表示当日，num为负数表示向历史推算的天数，num为正数表示向未来推算的天数
     :param num:
     :param f: 格式
@@ -193,6 +194,57 @@ def get_relative_datetime(
     today = datetime.datetime.now()
     date = today - datetime.timedelta(days=-num)
     return date.strftime(f)
+
+
+def get_datetime_relative(
+        days: int = 0,
+        f: str = '%Y-%m-%d %H:%M:%S'
+) -> str:
+    """
+    获取当前系统当前时间的相对时间
+
+    :param days: 0表示当日，num为负数表示向历史推算的天数，num为正数表示向未来推算的天数
+    :param f: 格式
+    :return: 形如 2022-06-07 12:16:52 的字符串
+    """
+    target_date = datetime.datetime.now() - datetime.timedelta(days=-days)
+    return target_date.strftime(f)
+
+
+def get_datetime_relative_min(
+        days: int = 0,
+        f: str = '%Y-%m-%d %H:%M:%S'
+) -> str:
+    """
+    获取当前系统当前时间的相对时间 的一天的 开始时间，例如：2022-06-07 00:00:00
+
+    :param days: 0表示当日，num为负数表示向历史推算的天数，num为正数表示向未来推算的天数
+    :param f: 格式
+    :return: 形如 2022-06-07 00:00:00 的字符串
+    """
+    target_date = datetime.date.today() - datetime.timedelta(days=-days)
+    return datetime.datetime.combine(
+        date=target_date,
+        time=datetime.time.min
+    ).strftime(f)
+
+
+def get_datetime_relative_max(
+        days: int = 0,
+        f: str = '%Y-%m-%d %H:%M:%S'
+) -> str:
+    """
+    获取当前系统当前时间的相对时间 的一天的 结束时间，例如：2022-06-07 23:59:59
+
+    :param days: 0表示当日，num为负数表示向历史推算的天数，num为正数表示向未来推算的天数
+    :param f: 格式
+    :return: 形如 2022-06-07 23:59:59 的字符串
+    """
+    target_date = datetime.date.today() - datetime.timedelta(days=-days)
+    return datetime.datetime.combine(
+        date=target_date,
+        time=datetime.time.max
+    ).strftime(f)
 
 
 def get_timestamp():
