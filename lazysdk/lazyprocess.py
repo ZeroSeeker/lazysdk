@@ -7,6 +7,7 @@
 @ Gitee : https://gitee.com/ZeroSeeker
 """
 from multiprocessing import Process
+from multiprocessing import Queue
 import showlog
 import time
 import copy
@@ -20,8 +21,9 @@ def run(
         subprocess_keep: bool = False,
         subprocess_limit: int = os_cpu_count * 2,
         master_process_delay: int = 1,
+        return_data:bool = False,
 
-        silence: bool = False,
+        silence: bool = False
 ):
     """
     多进程 进程控制
@@ -43,6 +45,7 @@ def run(
     active_process = dict()  # 活跃进程，存放进程，以task_index为key，进程信息为value的dict
     task_count = len(task_list)  # 总任务数量
     task_index_start = 0  # 用来计算启动的累计进程数
+    q = Queue()  # 生成一个队列对象，以实现进程通信
 
     showlog.info(f'正在准备多进程执行任务，总任务数为：{task_count}，进程数限制为：{subprocess_limit}...')
     # 创建并启动线程
@@ -66,10 +69,16 @@ def run(
                     showlog.info(f'发现需要开启的进程：{task_index}')
                 task_info = task_list[task_index]  # 提取将开启的进程的任务内容
                 # ---------- 开启进程 ----------
-                p = Process(
-                    target=task_function,
-                    args=(task_index, task_info)
-                )
+                if return_data is True:
+                    p = Process(
+                        target=task_function,
+                        args=(task_index, task_info, q)
+                    )
+                else:
+                    p = Process(
+                        target=task_function,
+                        args=(task_index, task_info)
+                    )
                 p.start()
                 # ---------- 开启进程 ----------
                 active_process[task_index] = {
@@ -84,6 +93,9 @@ def run(
         # 检测非活跃进程，并从active_process中剔除非活跃进程，以便开启新的进程
         inactive_process = list()  # 非活跃进程
         for process_index, process_info in active_process.items():
+            # print(q.qsize())
+            # print(q.get())
+            print(q.get_nowait())
             if process_info['process'].is_alive() is False:
                 if silence is False:
                     showlog.warning(f'进程 {process_index} 不活跃，将被剔除...')
