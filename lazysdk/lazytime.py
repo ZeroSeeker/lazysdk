@@ -833,3 +833,19 @@ def get_file_name(
     f_str = ''.join(f_list)
     data_time = inner_now.strftime(f_str)
     return data_time
+
+
+def format_seconds(
+        input_seconds
+):
+    """
+    输入秒数，以时间形式输出
+    """
+    seconds = int(input_seconds)
+    microseconds = (input_seconds * 1000000) % 1000000  # 精确到微秒
+    format_time = datetime.timedelta(
+        days=0,
+        seconds=seconds,  # 秒
+        microseconds=microseconds  # 微秒
+    )
+    return format_time
