@@ -21,7 +21,7 @@ def run(
         subprocess_keep: bool = False,
         subprocess_limit: int = os_cpu_count * 2,
         master_process_delay: int = 1,
-        return_data:bool = False,
+        return_data: bool = False,
 
         silence: bool = False
 ):
@@ -32,6 +32,7 @@ def run(
     :param subprocess_keep: 是否保持子进程，True为保持进程，死掉会自动重启；False为不保持，自然退出
     :param subprocess_limit: 进程数限制，0为无限制，否则按照设定的数量限制并行的子进程数量
     :param master_process_delay: 主进程循环延时，单位为秒，默认为1秒
+    :param return_data: 是否返回数据，True返回，False不返回
     :param silence: 静默模式，为True是不产生任何提示
 
     demo:
@@ -95,7 +96,7 @@ def run(
         for process_index, process_info in active_process.items():
             # print(q.qsize())
             # print(q.get())
-            print(q.get_nowait())
+            # print(q.get_nowait())
             if process_info['process'].is_alive() is False:
                 if silence is False:
                     showlog.warning(f'进程 {process_index} 不活跃，将被剔除...')
