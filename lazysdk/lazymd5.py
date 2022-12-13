@@ -30,7 +30,7 @@ def md5_file(
                 d5.update(data)  # update添加时会进行计算
         return d5.hexdigest()
     elif file_url:
-        resp = requests.get(file_path)
+        resp = requests.get(file_url)
         d5.update(resp.content)  # update添加时会进行计算
         return d5.hexdigest()
     else:
