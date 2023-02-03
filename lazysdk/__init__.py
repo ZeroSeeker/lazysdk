@@ -13,4 +13,5 @@ from . import lazytime
 from . import lazywebhook
 from . import lazyrandom
 from . import lazyip
+from . import lazyflask
 
