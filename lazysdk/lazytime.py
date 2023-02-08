@@ -849,3 +849,18 @@ def format_seconds(
         microseconds=microseconds  # 微秒
     )
     return format_time
+
+
+def get_gap_days(
+        date1: str,
+        date2: str,
+        data1_f: str = '%Y-%m-%d',
+        data2_f: str = '%Y-%m-%d'
+):
+    """
+    计算两个日期之间相差的天数
+    """
+    date1_date = datetime.datetime.strptime(date1, data1_f).date()
+    date2_date = datetime.datetime.strptime(date2, data2_f).date()
+    days = (date2_date - date1_date).days
+    return days
