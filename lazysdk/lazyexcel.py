@@ -12,6 +12,7 @@ import openpyxl  # 用于处理.xlsx，文档：https://openpyxl.readthedocs.io/
 import datetime
 import xlrd  # 用于处理.xls
 import os
+from .lazypath import path_separator
 
 
 # -------------------------------读取功能区域-------------------------------
@@ -219,7 +220,12 @@ def save_xlsx(
     :param value: 需要保存的数据
     :param date_cols: 按照既定规则转换时间，例如：{'日期': '%Y-%m-%d','时间': '%H:%M:%S'}，就会将表中对应字段转换为对应格式的时间
     :param col_name_dict: 自定义列名的对照关系，规则为：{'旧名称1':'新名称1', '旧名称2':'新名称2'}
+    将输出保存后的文件绝对路径
     """
+    if os.path.isabs(file):  # 判断是否为绝对路径
+        pass
+    else:
+        file = os.getcwd() + path_separator + file
     if value is None:
         return
     else:
@@ -279,7 +285,7 @@ def save_xlsx(
             sheet_index += 1
         wb.remove(wb.worksheets[-1])  # 删除最后一个默认的sheet
         wb.save(file)
-        return
+        return file
 
 
 def save(
