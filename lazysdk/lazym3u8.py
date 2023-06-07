@@ -454,7 +454,7 @@ def download_fragment(
     fragment_file_name_list = list()
     print('开始下载...')
     for index, each_url in enumerate(url_list):
-        print('正在下载', each_url)
+        print(f'  正在下载 {index+1}/{len(url_list)}', each_url)
         fragment_file_name = '%s%s%s.%s' % (fragment_path_new, path_separator, index, fragment_suffix)  # 生成碎片文件名
         # 开始下载碎片文件
         while True:
@@ -522,13 +522,13 @@ def download_fragment_single(
     fragment_url_name = task_info['fragment_url_name']
     fragment_path = task_info['fragment_path']
     aes_key = None,
-    headers = None,
     fragment_suffix = task_info['fragment_suffix']
+    headers = task_info['headers']
 
-    if headers is None:
-        headers_local = default_headers
-    else:
+    if headers:
         headers_local = headers
+    else:
+        headers_local = default_headers
 
     print('正在下载', fragment_url_name, fragment_url)
     fragment_file_name = '%s%s%s.%s' % (fragment_path, path_separator, fragment_url_name, fragment_suffix)  # 生成碎片文件名
@@ -572,7 +572,8 @@ def download_fragment_single(
 
 def download_fragment_quick(
         url_list,
-        subprocess_limit=None
+        subprocess_limit=None,
+        headers=None
 ):
     fragment_path = 'fragment_%s' % str(time.time()).replace('.', '')  # 使用时间戳命名
     fragment_suffix = 'ts'
@@ -585,7 +586,8 @@ def download_fragment_quick(
                 'fragment_url': each_url,
                 'fragment_url_name': url_index,
                 'fragment_path': fragment_path,
-                'fragment_suffix': fragment_suffix
+                'fragment_suffix': fragment_suffix,
+                'headers': headers
             }
         )
         fragment_file_name = '%s%s%s.%s' % (fragment_path, path_separator, url_index, fragment_suffix)  # 生成碎片文件名
