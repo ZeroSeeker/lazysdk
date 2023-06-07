@@ -571,7 +571,8 @@ def download_fragment_single(
 
 
 def download_fragment_quick(
-        url_list
+        url_list,
+        subprocess_limit=None
 ):
     fragment_path = 'fragment_%s' % str(time.time()).replace('.', '')  # 使用时间戳命名
     fragment_suffix = 'ts'
@@ -590,8 +591,9 @@ def download_fragment_quick(
         fragment_file_name = '%s%s%s.%s' % (fragment_path, path_separator, url_index, fragment_suffix)  # 生成碎片文件名
         fragment_file_name_list.append(fragment_file_name)
     lazyprocess.run(
-        task_list=url_list,
-        task_function=download_fragment_single
+        task_list=task_list,
+        task_function=download_fragment_single,
+        subprocess_limit=subprocess_limit
     )
     download_res = {
         'fragment_path': fragment_path,
