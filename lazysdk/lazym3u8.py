@@ -16,6 +16,7 @@ import time
 import sys
 import os
 import re
+from rich.progress import track
 
 
 timeout = 10
@@ -435,7 +436,7 @@ def download_fragment(
     :return:
     """
     if headers is None:
-        headers_local = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36"}
+        headers_local = default_headers
     else:
         headers_local = headers
 
@@ -452,17 +453,18 @@ def download_fragment(
     fragment_file_name_list = list()
     print('开始下载...')
     for index, each_url in enumerate(url_list):
-        print(each_url)
+        print('正在下载', each_url)
         fragment_file_name = '%s%s%s.%s' % (fragment_path_new, path_separator, index, fragment_suffix)  # 生成碎片文件名
         # 开始下载碎片文件
         while True:
             try:
                 with open(fragment_file_name, "ab+") as f:
-                    time_pre = time.time()
-                    response = requests.get(url=each_url,
-                                            headers=headers_local,
-                                            stream=True,
-                                            timeout=10)
+                    response = requests.get(
+                        url=each_url,
+                        headers=headers_local,
+                        stream=True,
+                        timeout=timeout
+                    )
                     total_length = response.headers.get('content-length')
 
                     if total_length is None:
@@ -470,9 +472,12 @@ def download_fragment(
                     else:
                         dl = 0
                         total_length = int(total_length)
-                        char_list = ['\\', '|', '/', '-']
-                        _index_ = 0
-                        for data in response.iter_content(chunk_size=8192):
+                        for data in track(
+                                sequence=response.iter_content(chunk_size=8192),
+                                description='下载中',
+                                total=total_length/8192,
+                                show_speed=True
+                        ):
                             dl += len(data)
                             if aes_key is None:
                                 data_decode = data
@@ -480,18 +485,9 @@ def download_fragment(
                                 data_decode = lazyCrypto.aes_decode(data, aes_key)
                             f.write(data_decode)
                             f.flush()
-                            done = int(40 * dl / total_length)
-                            time_now = time.time()
-                            sys.stdout.write("\r第 [ %s/%s ] 部分下载中: %s [%s%s] %.2f%%  %.2fMB / %.2fMB SPEED: %.2fMB/s" % (
-                            index + 1, len(url_list), char_list[_index_], '=' * done, ' ' * (40 - done), (dl / total_length) * 100,
-                            dl / 1000000, total_length / 1000000, (dl / (1024.0 * 1024.0 * 1024.0)) / ((time_now - time_pre) / 1000)))
-                            sys.stdout.flush()
-                            _index_ = (_index_ + 1) % len(char_list)
-                    # print("")
                 break
             except:
-                print('下载超时，将在1秒后重试...')
-                showlog.error('')
+                showlog.warning('下载超时，将在1秒后重试...')
                 os.remove(fragment_file_name)
                 time.sleep(1)
                 pass
@@ -742,8 +738,3 @@ def convert_video(
     flags = ["ffmpeg", "-i", f"{video_input}.ts", "-acodec", "copy", "-vcodec", "copy", video_output]
     subprocess.Popen(flags, stdout=subprocess.DEVNULL).wait()
     # os.unlink(f"{video_input}.ts")  # 删除文件
-
-
-if __name__ == '__main__':
-    test_m3u8_url = input('请输入需要下载的m3u8地址：')
-    download_m3u8_to_file(m3u8_url=test_m3u8_url)
