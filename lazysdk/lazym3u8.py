@@ -5,6 +5,7 @@ from . import lazytime
 from . import lazyfile
 from . import lazypath
 from . import lazymd5
+from . import lazyprocess
 import subprocess
 import threading
 import requests
@@ -497,6 +498,103 @@ def download_fragment(
     print("\n:) 下载完成")
     download_res = {
         'fragment_path': fragment_path_new,
+        'fragment_suffix': fragment_suffix,
+        'fragment_file_name_list': fragment_file_name_list
+    }
+    return download_res
+
+
+def download_fragment_single(
+        task_index,
+        task_info,
+):
+    """
+    模块功能：下载单个碎片到指定文件夹
+    :param fragment_url: 碎片下载地址
+    :param fragment_url_name: 碎片名
+    :param fragment_path:碎片保存路径
+    :param aes_key: aes解密key
+    :param headers:请求头
+    :param fragment_suffix:碎片文件后缀名
+    :return:
+    """
+    fragment_url = task_info['fragment_url']
+    fragment_url_name = task_info['fragment_url_name']
+    fragment_path = task_info['fragment_path']
+    aes_key = None,
+    headers = None,
+    fragment_suffix = task_info['fragment_suffix']
+
+    if headers is None:
+        headers_local = default_headers
+    else:
+        headers_local = headers
+
+    print('正在下载', fragment_url_name, fragment_url)
+    fragment_file_name = '%s%s%s.%s' % (fragment_path, path_separator, fragment_url_name, fragment_suffix)  # 生成碎片文件名
+    # 开始下载碎片文件
+    while True:
+        try:
+            with open(fragment_file_name, "ab+") as f:
+                response = requests.get(
+                    url=fragment_url,
+                    headers=headers_local,
+                    stream=True,
+                    timeout=timeout
+                )
+                total_length = response.headers.get('content-length')
+
+                if total_length is None:
+                    print("Attention: There is no content length in header!")  # 未返回长度信息
+                else:
+                    dl = 0
+                    total_length = int(total_length)
+                    for data in track(
+                            sequence=response.iter_content(chunk_size=8192),
+                            description='下载中',
+                            total=total_length/8192,
+                            show_speed=True
+                    ):
+                        dl += len(data)
+                        if aes_key is None:
+                            data_decode = data
+                        else:
+                            data_decode = lazyCrypto.aes_decode(data, aes_key)
+                        f.write(data_decode)
+                        f.flush()
+            break
+        except:
+            showlog.warning('下载超时，将在1秒后重试...')
+            os.remove(fragment_file_name)
+            time.sleep(1)
+            pass
+
+
+def download_fragment_quick(
+        url_list
+):
+    fragment_path = 'fragment_%s' % str(time.time()).replace('.', '')  # 使用时间戳命名
+    fragment_suffix = 'ts'
+    lazypath.make_path(fragment_path)
+    task_list = list()
+    fragment_file_name_list = list()
+    for url_index, each_url in enumerate(url_list):
+        task_list.append(
+            {
+                'fragment_url': each_url,
+                'fragment_url_name': url_index,
+                'fragment_path': fragment_path,
+                'fragment_suffix': fragment_suffix
+            }
+        )
+        fragment_file_name = '%s%s%s.%s' % (fragment_path, path_separator, url_index, fragment_suffix)  # 生成碎片文件名
+        fragment_file_name_list.append(fragment_file_name)
+    lazyprocess.run(
+        task_list=url_list,
+        task_function=download_fragment_single
+    )
+    download_res = {
+        'fragment_path': fragment_path,
         'fragment_suffix': fragment_suffix,
         'fragment_file_name_list': fragment_file_name_list
     }
