@@ -19,7 +19,7 @@ def run(
         task_list: list,
         task_function,
         subprocess_keep: bool = False,
-        subprocess_limit: int = os_cpu_count * 2,
+        subprocess_limit: int = None,
         master_process_delay: int = 1,
         return_data: bool = False,
 
@@ -43,6 +43,10 @@ def run(
         # 进程详细的内容
         print(task_index, task_info)
     """
+    if subprocess_limit:
+        pass
+    else:
+        subprocess_limit = os_cpu_count * 2
     active_process = dict()  # 活跃进程，存放进程，以task_index为key，进程信息为value的dict
     task_count = len(task_list)  # 总任务数量
     task_index_start = 0  # 用来计算启动的累计进程数
