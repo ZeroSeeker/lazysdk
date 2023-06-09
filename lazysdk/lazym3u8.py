@@ -603,7 +603,8 @@ def download_fragment_quick(
     lazyprocess.run(
         task_list=task_list,
         task_function=download_fragment_single,
-        subprocess_limit=subprocess_limit
+        subprocess_limit=subprocess_limit,
+        silence=True
     )
 
     download_res = {
