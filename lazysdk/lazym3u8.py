@@ -573,9 +573,16 @@ def download_fragment_single(
 def download_fragment_quick(
         url_list,
         subprocess_limit=None,
-        headers=None
+        headers=None,
+        video_path=None
 ):
-    fragment_path = 'fragment_%s' % str(time.time()).replace('.', '')  # 使用时间戳命名
+    """
+    使用多进程并发下载素材，提升下载效率
+    """
+    if video_path:
+        fragment_path = f"{video_path}{path_separator}fragment_{str(time.time()).replace('.', '')}"   # 使用时间戳命名
+    else:
+        fragment_path = f"fragment_{str(time.time()).replace('.', '')}"  # 使用时间戳命名
     fragment_suffix = 'ts'
     lazypath.make_path(fragment_path)
     task_list = list()
