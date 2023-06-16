@@ -14,6 +14,8 @@ import datetime
 import xlrd  # 用于处理.xls
 import os
 from .lazypath import path_separator
+from .lazytime import get_format_date
+from .lazytime import get_format_datetime
 
 
 # -------------------------------读取功能区域-------------------------------
@@ -212,7 +214,8 @@ def read(
 def save_xlsx(
         file: str,
         value: dict = None,
-        date_cols: dict = None,
+        date_cols: list = None,
+        datetime_cols: list = None,
         num_cols: list = None,
         col_name_dict: dict = None,
         col_name_sort: list = None
@@ -221,7 +224,8 @@ def save_xlsx(
     如果输入的value是乱序，将重新排序
     :param file: 文件路径
     :param value: 需要保存的数据
-    :param date_cols: 按照既定规则转换时间，例如：{'日期': '%Y-%m-%d','时间': '%H:%M:%S'}，就会将表中对应字段转换为对应格式的时间
+    :param date_cols: 按照既定规则转换日期，例如：['日期']，就会将表中对应字段转换为对应格式的日期
+    :param datetime_cols: 按照既定规则转换时间，例如：['时间']，就会将表中对应字段转换为对应格式的时间
     :param num_cols: 数字列列表
     :param col_name_dict: 自定义列名的对照关系，规则为：{'旧名称1':'新名称1', '旧名称2':'新名称2'}
     :param col_name_sort: 自定义列名排序，将按照列表顺序排，如果不在列表中，将随机
@@ -250,28 +254,37 @@ def save_xlsx(
                 sheet_data_f = lazydict.list_same_order_dict(list_data=sheet_data)
                 if date_cols is not None:
                     for each_sheet_data_f in sheet_data_f:
-                        for date_key, date_f in date_cols.items():
-                            try:
-                                date_value = each_sheet_data_f.get(date_key)
-                                if date_value is not None:
-                                    date_value_f = datetime.datetime.strptime(date_value, date_f)
-                                    each_sheet_data_f[date_key] = date_value_f
-                                else:
+                        # 日期格式化
+                        for date_key in date_cols:
+                            date_value = each_sheet_data_f.get(date_key)
+                            if date_value:
+                                try:
+                                    each_sheet_data_f[date_key] = get_format_date(date_ori=date_value)
+                                except:
                                     pass
-                            except:
-                                pass
+                            else:
+                                continue
+                        # 时间格式化
+                        for datetime_key in datetime_cols:
+                            datetime_value = each_sheet_data_f.get(datetime_key)
+                            if datetime_value:
+                                try:
+                                    each_sheet_data_f[datetime_key] = get_format_datetime(datetime_ori=datetime_value)
+                                except:
+                                    pass
+                            else:
+                                continue
 
-                            # 这里对数据做转换成数字的预处理
-                            for each_num_col in num_cols:
-                                date_value = each_sheet_data_f.get(each_num_col)
-                                if date_value:
-                                    try:
-                                        date_value_num = decimal.Decimal(date_value)
-                                        each_sheet_data_f[each_num_col] = date_value_num
-                                    except:
-                                        pass
-                                else:
+                        # 数字格式化
+                        for each_num_col in num_cols:
+                            date_value = each_sheet_data_f.get(each_num_col)
+                            if date_value:
+                                try:
+                                    each_sheet_data_f[each_num_col] = decimal.Decimal(date_value)
+                                except:
                                     pass
+                            else:
+                                pass
                 else:
                     pass
                 # 写入标题行
