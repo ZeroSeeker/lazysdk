@@ -240,10 +240,12 @@ def save_xlsx(
     else:
         wb = openpyxl.Workbook()
         sheet_index = 0
-        if num_cols:
-            pass
-        else:
+        if not num_cols:
             num_cols = []
+        if not date_cols:
+            date_cols = []
+        if not datetime_cols:
+            datetime_cols = []
 
         for sheet_name, sheet_data in value.items():
             sheet = wb.create_sheet(title=sheet_name, index=sheet_index)
