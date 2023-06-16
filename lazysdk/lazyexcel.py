@@ -6,6 +6,7 @@
 @ GitHub : https://github.com/ZeroSeeker
 @ Gitee : https://gitee.com/ZeroSeeker
 """
+import decimal
 from collections import OrderedDict
 from . import lazydict
 import openpyxl  # 用于处理.xlsx，文档：https://openpyxl.readthedocs.io/en/stable/
@@ -212,14 +213,18 @@ def save_xlsx(
         file: str,
         value: dict = None,
         date_cols: dict = None,
-        col_name_dict: dict = None
+        num_cols: list = None,
+        col_name_dict: dict = None,
+        col_name_sort: list = None
 ):
     """
     如果输入的value是乱序，将重新排序
     :param file: 文件路径
     :param value: 需要保存的数据
     :param date_cols: 按照既定规则转换时间，例如：{'日期': '%Y-%m-%d','时间': '%H:%M:%S'}，就会将表中对应字段转换为对应格式的时间
+    :param num_cols: 数字列列表
     :param col_name_dict: 自定义列名的对照关系，规则为：{'旧名称1':'新名称1', '旧名称2':'新名称2'}
+    :param col_name_sort: 自定义列名排序，将按照列表顺序排，如果不在列表中，将随机
     将输出保存后的文件绝对路径
     """
     if os.path.isabs(file):  # 判断是否为绝对路径
@@ -231,6 +236,11 @@ def save_xlsx(
     else:
         wb = openpyxl.Workbook()
         sheet_index = 0
+        if num_cols:
+            pass
+        else:
+            num_cols = []
+
         for sheet_name, sheet_data in value.items():
             sheet = wb.create_sheet(title=sheet_name, index=sheet_index)
             row_num = 1  # 行序号
@@ -250,6 +260,18 @@ def save_xlsx(
                                     pass
                             except:
                                 pass
+
+                            # 这里对数据做转换成数字的预处理
+                            for each_num_col in num_cols:
+                                date_value = each_sheet_data_f.get(each_num_col)
+                                if date_value:
+                                    try:
+                                        date_value_num = decimal.Decimal(date_value)
+                                        each_sheet_data_f[each_num_col] = date_value_num
+                                    except:
+                                        pass
+                                else:
+                                    pass
                 else:
                     pass
                 # 写入标题行
