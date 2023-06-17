@@ -6,6 +6,7 @@
 @ GitHub : https://github.com/ZeroSeeker
 @ Gitee : https://gitee.com/ZeroSeeker
 """
+import copy
 from collections import OrderedDict
 from urllib import parse
 
@@ -182,12 +183,14 @@ def list_dict_tiler(list_in, connector_str='-'):
 
 def list_same_order_dict(
         list_data: list = None,
-        na_value=None
+        na_value=None,
+        keys_sort: list = None
 ) -> list:
     """
     list重排格式化，将单层dict组成的list按照全部key的顺序排序并补充缺失值
     :param list_data: 原始list
     :param na_value: 缺失值的默认值
+    :param keys_sort: 指定顺序,按照指定列的顺序先排，不包含的向后排
     :return list_data_f: 处理后的结果
 
     test data:
@@ -198,18 +201,33 @@ def list_same_order_dict(
             {'c': 21}
         ]
     """
-    keys = list()
+    keys = list()  # 存储所有的key
     for each_dict in list_data:
-        each_keys = list(each_dict.keys())
+        # 遍历list中的每个dict
+        each_keys = list(each_dict.keys())  # 提取当前dict的所有key
         for each_key in each_keys:
+            # 遍历，得到全量唯一的key
             if each_key in keys:
                 continue
             else:
                 keys.append(each_key)
-    list_data_f = list()
+    keys.sort()  # 先按照升序排序一次
+    if keys_sort:
+        keys_new = copy.deepcopy(keys_sort)  # 先直接拷贝一下排序表
+        for each_key in keys:
+            # 遍历生成的key列表
+            if each_key in keys_new:
+                # 如果遍历的key已存在，将跳过
+                continue
+            else:
+                # 如果遍历的key不已存在，则追加
+                keys_new.append(each_key)
+    else:
+        keys_new = copy.deepcopy(keys)
+    list_data_f = list()  # 存储处理后的数据
     for each_dict in list_data:
         each_dict_order = OrderedDict()  # 有序字典
-        for each_key in keys:
+        for each_key in keys_new:
             each_dict_order[each_key] = each_dict.get(each_key, na_value)
         list_data_f.append(each_dict_order)
     return list_data_f

@@ -223,7 +223,7 @@ def save_xlsx(
     """
     如果输入的value是乱序，将重新排序
     :param file: 文件路径
-    :param value: 需要保存的数据
+    :param value: 需要保存的数据，按照{"sheet名": [数据列表]}的形式
     :param date_cols: 按照既定规则转换日期，例如：['日期']，就会将表中对应字段转换为对应格式的日期
     :param datetime_cols: 按照既定规则转换时间，例如：['时间']，就会将表中对应字段转换为对应格式的时间
     :param num_cols: 数字列列表
@@ -239,7 +239,8 @@ def save_xlsx(
         return
     else:
         wb = openpyxl.Workbook()
-        sheet_index = 0
+        sheet_index = 0  # sheet序号
+
         if not num_cols:
             num_cols = []
         if not date_cols:
@@ -248,12 +249,22 @@ def save_xlsx(
             datetime_cols = []
 
         for sheet_name, sheet_data in value.items():
-            sheet = wb.create_sheet(title=sheet_name, index=sheet_index)
+            # 遍历每个要存储的sheet,sheet_name为sheet的名称，sheet_data为对应sheet的数据
+            sheet = wb.create_sheet(
+                title=sheet_name,
+                index=sheet_index
+            )  # 创建一个sheet
             row_num = 1  # 行序号
             col_num = 1  # 列序号
-            if len(sheet_data) > 0:
+            if sheet_data:
+                # 先按照要求处理数据，处理好数据后统一排序
+
                 # 如果数据是乱序，需要先排序
-                sheet_data_f = lazydict.list_same_order_dict(list_data=sheet_data)
+                sheet_data_f = lazydict.list_same_order_dict(
+                    list_data=sheet_data,
+                    keys_sort=col_name_sort
+                )  # 先对要存储的数据做排序对齐
+
                 if date_cols is not None:
                     for each_sheet_data_f in sheet_data_f:
                         # 日期格式化
