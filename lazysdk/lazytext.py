@@ -52,3 +52,18 @@ def get_url(
             # 这不是一个链接
             continue
     return url_list
+
+
+def path_clean(content):
+    """
+    清除路径前后可能出现的引号
+    """
+    if content[0] == '"' and content[-1] == '"':
+        content = content[1:-1]
+    elif content[0] == '“' and content[-1] == '”':
+        content = content[1:-1]
+    elif content[0] == "'" and content[-1] == "'":
+        content = content[1:-1]
+    else:
+        pass
+    return content

@@ -6,6 +6,7 @@
 @ GitHub : https://github.com/ZeroSeeker
 @ Gitee : https://gitee.com/ZeroSeeker
 """
+import subprocess
 import platform
 import shutil
 import sys
@@ -143,3 +144,13 @@ def file_list(
         file_dir=os.path.dirname(os.path.realpath(__file__))
 ):
     return os.listdir(file_dir)
+
+
+def open_path(path):
+    """
+    打开某个路径/文件
+    """
+    if platform.system() == 'Windows':
+        os.startfile(path)  # Windows上打开文件
+    else:
+        subprocess.check_call(['open', path])  # 非Windows上打开文件
