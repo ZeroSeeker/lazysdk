@@ -15,4 +15,6 @@ from . import lazyrandom
 from . import lazyip
 from . import lazyflask
 from . import lazyid
+from . import lazyurl
+from . import lazyua
 
