@@ -92,7 +92,7 @@ def project_path(
     return _project_path
 
 
-def file_path():
+def file_path(__file__):
     """
     os.path.dirname(os.path.abspath(__file__))  单纯的文件地址
     os.path.dirname(os.path.realpath(__file__))  可能会存在的文件指向的真实地址
@@ -154,3 +154,18 @@ def open_path(path):
         os.startfile(path)  # Windows上打开文件
     else:
         subprocess.check_call(['open', path])  # 非Windows上打开文件
+
+
+def path_clean(content):
+    """
+    清除路径前后可能出现的引号
+    """
+    if content[0] == '"' and content[-1] == '"':
+        content = content[1:-1]
+    elif content[0] == '“' and content[-1] == '”':
+        content = content[1:-1]
+    elif content[0] == "'" and content[-1] == "'":
+        content = content[1:-1]
+    else:
+        pass
+    return content
