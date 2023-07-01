@@ -263,41 +263,43 @@ def safe_download(
 
 
 def read(
-        file_name,
-        postfix="txt",
+        file,
+        postfix=None,
         path=None,
-        silence=False
+        silence=False,
+        json_auto=True
 ):
+    """
+    读取文件
+    json_auto：json格式自动转换
+    """
+    if path:
+        # 如果指定了路径，就加上路径
+        file_dir = f'{path}{path_separator}{file}'
+    else:
+        # 如果没指定路径，就直接使用文件名
+        file_dir = file
+
+    if postfix:
+        # 如果指定了后缀名，就加上后缀名
+        file_dir = f'{file}.{postfix}'
+    else:
+        # 如果没指定后缀名，就忽略
+        pass
     try:
-        if postfix == "txt":
-            if path is None:
-                f = open("%s.%s" % (file_name, postfix), encoding='utf-8')
-            else:
-                f = open("%s/%s.%s" % (path, file_name, postfix), encoding='utf-8')
-            res = f.read()
-            return res
-        elif postfix == "json":
+        if postfix == "json" and json_auto:
             content_list = list()
-            if path is None:
-                with open("%s.%s" % (file_name, postfix), 'r', encoding='utf-8') as f:
-                    content = f.readlines()
-                    for each in content:
-                        each_json = json.loads(each)
-                        content_list.append(each_json)
-            else:
-                with open("./%s/%s.%s" % (path, file_name, postfix), 'r', encoding='utf-8') as f:
-                    content = f.readlines()
-                    for each in content:
-                        each_json = json.loads(each)
-                        content_list.append(each_json)
+            with open(file=file_dir, mode='r', encoding='utf-8') as f:
+                content = f.readlines()
+                for each in content:
+                    each_json = json.loads(each)
+                    content_list.append(each_json)
             return content_list
         else:
-            if path is None:
-                f = open("%s.%s" % (file_name, postfix), encoding='utf-8')
-            else:
-                f = open("%s/%s.%s" % (path, file_name, postfix), encoding='utf-8')
+            f = open(file=file_dir, mode='r', encoding='utf-8')
             res = f.read()
             return res
+
     except Exception as e:
         if silence is True:
             pass

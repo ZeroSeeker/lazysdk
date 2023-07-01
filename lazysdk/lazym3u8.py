@@ -657,7 +657,7 @@ def download_m3u8(
     if m3u8_file_path is not None:
         print("正在解析m3u8文件...")
         all_content = lazyfile.read(
-            file_name=m3u8_file_path,
+            file=m3u8_file_path,
             postfix=postfix
         )
         m3u8_lines = all_content.split("\n")  # 读取文件里的每一行
