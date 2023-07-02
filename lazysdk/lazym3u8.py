@@ -733,7 +733,7 @@ def download_m3u8_to_file(
                 return False
             else:
                 lazyfile.save(
-                    file_name=temp_filename,
+                    file=temp_filename,
                     content=m3u8_content,
                     postfix="m3u8",
                     path=video_save_path,
@@ -751,7 +751,7 @@ def download_m3u8_to_file(
             m3u8_file = m3u8_file_maker(m3u8_url=m3u8_url)
             print(':) 获取m3u8内容成功')
             lazyfile.save(
-                file_name=temp_filename,
+                file=temp_filename,
                 content=m3u8_file,
                 postfix="m3u8",
                 path=video_save_path,

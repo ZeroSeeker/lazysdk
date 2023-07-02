@@ -264,10 +264,10 @@ def safe_download(
 
 def read(
         file,
-        postfix=None,
-        path=None,
-        silence=False,
-        json_auto=True
+        postfix: str = None,
+        path: str = None,
+        silence: bool = False,
+        json_auto: bool = True
 ):
     """
     读取文件
@@ -306,6 +306,46 @@ def read(
         else:
             showlog.warning(e)
         return
+
+
+def save(
+        file,
+        content,
+        postfix: str = None,
+        path: str = None,
+        overwrite: str = True,
+        encoding: str = 'utf-8'
+):
+    """
+    保存文件
+    """
+    if path:
+        # 如果指定了路径，就加上路径
+        lazypath.make_path(path)
+        file_dir = f'{path}{path_separator}{file}'
+    else:
+        # 如果没指定路径，就直接使用文件名
+        file_dir = file
+
+    if postfix:
+        # 如果指定了后缀名，就加上后缀名
+        file_dir = f'{file}.{postfix}'
+    else:
+        # 如果没指定后缀名，就忽略
+        pass
+
+    if overwrite is True:
+        write_mode = "w"  # 覆盖
+    else:
+        write_mode = "a"  # 追加
+
+    f = open(
+        file=file_dir,
+        mode=write_mode,
+        encoding=encoding
+    )
+    f.write(content)
+    f.close()
 
 
 def read_(_source_file):
@@ -494,30 +534,6 @@ class DateEncoder(json.JSONEncoder):
             return obj.strftime("%Y-%m-%d %H:%M:%S")
         else:
             return json.JSONEncoder.default(self, obj)
-
-
-def save(
-        file_name,
-        content,
-        postfix: str = "txt",
-        path=None,
-        overwrite=True
-):
-    """
-    增加自动创建目录功能
-    """
-    if overwrite is True:
-        write_mode = "w"  # 覆盖
-    else:
-        write_mode = "a"  # 追加
-
-    if path is None:
-        f = open("%s.%s" % (file_name, postfix), write_mode, encoding='utf-8')
-    else:
-        lazypath.make_path(path)
-        f = open("%s%s%s.%s" % (path, path_separator, file_name, postfix), write_mode, encoding='utf-8')
-    f.write(content)
-    f.close()
 
 
 def save_list(
