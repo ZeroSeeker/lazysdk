@@ -17,4 +17,5 @@ from . import lazyflask
 from . import lazyid
 from . import lazyurl
 from . import lazyua
+from . import lazy_id_card
 
