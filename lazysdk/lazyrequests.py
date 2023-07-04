@@ -21,6 +21,7 @@ def lazy_requests(
         ReadTimeout_retry: bool = True,  # 超时重试
         JSONDecodeError_retry: bool = True,  # 返回非json类型重试
         ConnectionError_retry: bool = True,  # 连接错误重试
+        ChunkedEncodingError: bool = True,
 
         **kwargs
 ):
@@ -59,6 +60,11 @@ def lazy_requests(
                 time.sleep(retry_delay)
         except requests.exceptions.ConnectionError:  # 包含ProxyError
             if ConnectionError_retry is True:
+                retry_count += 1
+                showlog.warning(f'ConnectionError_retry，将在{retry_delay}秒后重试第{retry_count}次...')
+                time.sleep(retry_delay)
+        except requests.exceptions.ChunkedEncodingError:
+            if ChunkedEncodingError is True:
                 retry_count += 1
                 showlog.warning(f'ConnectionError_retry，将在{retry_delay}秒后重试第{retry_count}次...')
                 time.sleep(retry_delay)
