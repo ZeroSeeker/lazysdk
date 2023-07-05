@@ -66,7 +66,7 @@ def lazy_requests(
         except requests.exceptions.ChunkedEncodingError:
             if ChunkedEncodingError is True:
                 retry_count += 1
-                showlog.warning(f'ConnectionError_retry，将在{retry_delay}秒后重试第{retry_count}次...')
+                showlog.warning(f'ChunkedEncodingError_retry，将在{retry_delay}秒后重试第{retry_count}次...')
                 time.sleep(retry_delay)
         if retry_limit == 0:
             break
