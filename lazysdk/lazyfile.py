@@ -28,6 +28,30 @@ else:
 headers_default = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101 Firefox/68.0"}
 
 
+def delete(
+        file,
+        postfix: str = None,
+        path: str = None,
+):
+    """
+    删除文件
+    """
+    if path:
+        # 如果指定了路径，就加上路径
+        file_dir = f'{path}{path_separator}{file}'
+    else:
+        # 如果没指定路径，就直接使用文件名
+        file_dir = file
+
+    if postfix:
+        # 如果指定了后缀名，就加上后缀名
+        file_dir = f'{file}.{postfix}'
+    else:
+        # 如果没指定后缀名，就忽略
+        pass
+    os.remove(file_dir)
+
+
 def get_suffix(
         file_name: str
 ):
