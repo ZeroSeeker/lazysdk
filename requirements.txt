@@ -6,7 +6,7 @@ redis==4.1.0
 ua_parser==0.10.0
 openpyxl==3.0.9
 xlrd==2.0.1
-numpy==1.22.0
+numpy>=1.22.0
 m3u8==3.5.0
 pycryptodome==3.10.1
 
