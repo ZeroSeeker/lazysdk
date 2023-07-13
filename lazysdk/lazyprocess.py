@@ -46,7 +46,10 @@ def run(
     if subprocess_limit:
         pass
     else:
-        subprocess_limit = os_cpu_count * 2
+        if os_cpu_count > 1:
+            subprocess_limit = os_cpu_count - 1  # 进程数设置为cpu核心数减1
+        else:
+            subprocess_limit = 1
     active_process = dict()  # 活跃进程，存放进程，以task_index为key，进程信息为value的dict
     task_count = len(task_list)  # 总任务数量
     task_index_start = 0  # 用来计算启动的累计进程数
@@ -64,11 +67,16 @@ def run(
                 # 进程不存在，待定
                 if subprocess_limit > 0:
                     # 存在子进程数量限制规则，待定
-                    if len(active_process) >= subprocess_limit:
+                    if len(active_process.keys()) >= subprocess_limit:
                         # 当前活跃进程数量达到子进程数限制，本次循环不再新增进程，跳出
                         if silence is False:
                             showlog.warning('达到进程数限制')
                         break
+                    else:
+                        # 未达到进程数限制
+                        pass
+                else:
+                    pass
                 # 不存在子进程限制规则/当前活跃进程数量未达到进程数限制，将开启一个新进程
                 if silence is False:
                     showlog.info(f'发现需要开启的进程：{task_index}')
@@ -96,7 +104,7 @@ def run(
                 task_index_start += 1  # 记录累计开启进程数
 
         # 检测非活跃进程，并从active_process中剔除非活跃进程，以便开启新的进程
-        inactive_process = list()  # 非活跃进程
+        inactive_process_temp = list()  # 非活跃进程
         for process_index, process_info in active_process.items():
             # print(q.qsize())
             # print(q.get())
@@ -104,11 +112,16 @@ def run(
             if process_info['process'].is_alive() is False:
                 if silence is False:
                     showlog.warning(f'进程 {process_index} 不活跃，将被剔除...')
-                inactive_process.append(process_index)
-        for each_dead_process in inactive_process:
-            active_process.pop(each_dead_process)
+                inactive_process_temp.append(process_index)
+        if inactive_process_temp:
+            for each_dead_process in inactive_process_temp:
+                active_process.pop(each_dead_process)
+        else:
+            pass
 
-        if task_index_start >= len(task_list) and len(active_process) == 0:
+        showlog.info(f'>> 当前活跃进程数：{len(active_process.keys())}')
+
+        if task_index_start >= len(task_list) and len(active_process.keys()) == 0:
             if silence is False:
                 showlog.info('全部任务执行完成')
             if subprocess_keep is True:
