@@ -13,7 +13,7 @@ with open("README.md", "r", encoding='utf-8') as fh:
 
 setuptools.setup(
     name="lazysdk",
-    version="0.1.29",
+    version="0.1.30",
     description="基于Python的懒人包",
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -35,7 +35,6 @@ setuptools.setup(
         'ua_parser==0.10.0',
         'openpyxl==3.0.9',
         'xlrd==2.0.1',
-        'numpy>=1.22.0',
         'm3u8==3.5.0',
         'pycryptodome==3.10.1',
         'filetype==1.2.0'

@@ -6,7 +6,6 @@
 @ GitHub : https://github.com/ZeroSeeker
 @ Gitee : https://gitee.com/ZeroSeeker
 """
-from numpy import random as np_random
 import string
 import random
 
@@ -33,19 +32,20 @@ def random_str(
         random_sample += string.ascii_uppercase
     if numbers is True:
         random_sample += string.digits
-    random_sample_list = list(random_sample)
     if repeat:
-        value = ''.join(np_random.choice(
-            a=random_sample_list,
-            size=str_length,
-            replace=True
-        )
-        )  # 可重复采样
+        # 可重复采样
+        value = ''
+        for _ in range(str_length):
+            value += random.sample(
+                random_sample,
+                1
+            )[0]
     else:
+        # 不重复采样
         value = ''.join(
             random.sample(
                 random_sample,
                 str_length
             )
-        )  # 不重复采样
+        )
     return value
