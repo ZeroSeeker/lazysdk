@@ -180,3 +180,33 @@ def path_clean(content):
     else:
         pass
     return content
+
+
+def file_info(
+        file
+):
+    """
+    获取文件信息
+    """
+    res = dict()
+    res['file'] = file
+    res['path_exists'] = os.path.exists(file)  # 文件/路径是否存在
+    if os.path.exists(file):
+        # 文件存在，继续获取详细信息
+        create_time = os.path.getctime(file)
+        if os.path.isdir(file):
+            res['path_type'] = 'dir'
+            res['path_name'] = os.path.basename(file)
+        elif os.path.isfile(file):
+            res['path_type'] = 'file'
+            res['file_name'] = os.path.basename(file)
+        else:
+            res['path_type'] = ''
+
+        res['path_isabs'] = os.path.isabs(file)  # 是否为绝对路径
+        res['size'] = os.path.getsize(file)  # 获取大小
+        res['dir_name'] = os.path.dirname(file)  # 上层目录名
+    else:
+        # 文件不存在
+        pass
+    return res
