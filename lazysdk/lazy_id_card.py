@@ -12,6 +12,7 @@ def id_info(
 
 通过身份证号码的性别位，我们可以快速判断持证人的性别。
     """
+    id_str = id_str.replace(' ', '').replace('\n', '').replace('\r', '').replace('\t', '')
     if len(id_str) == 18:
         pass
     else:

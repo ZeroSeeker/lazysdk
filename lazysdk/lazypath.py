@@ -141,9 +141,19 @@ def visit_dir(
 
 
 def file_list(
-        file_dir=os.path.dirname(os.path.realpath(__file__))
+        file_dir=os.path.dirname(os.path.realpath(__file__)),
+        with_path=False
 ):
-    return os.listdir(file_dir)
+    """
+    对某个路径枚举路径下的文件列表
+    """
+    dir_file_list = os.listdir(file_dir)
+    if with_path:
+        dir_file_list_f = list()
+        for each in dir_file_list:
+            dir_file_list_f.append(os.path.join(file_dir, each))
+    else:
+        return dir_file_list
 
 
 def open_path(path):

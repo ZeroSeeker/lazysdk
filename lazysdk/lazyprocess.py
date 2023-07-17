@@ -128,4 +128,6 @@ def run(
                 task_index_start = 0  # 将累计启动进程数重置为0
             else:
                 return
+        else:
+            pass
         time.sleep(master_process_delay)
