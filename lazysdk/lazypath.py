@@ -11,6 +11,7 @@ import platform
 import shutil
 import sys
 import os
+import filetype
 current_user_path = os.path.abspath('.')
 if platform.system() == 'Windows':
     path_separator = '\\'
@@ -206,6 +207,11 @@ def file_info(
         res['path_isabs'] = os.path.isabs(file)  # 是否为绝对路径
         res['size'] = os.path.getsize(file)  # 获取大小
         res['dir_name'] = os.path.dirname(file)  # 上层目录名
+
+        guess_kind = filetype.guess(file)  # 猜测文件类型
+        if guess_kind:
+            res['file_extension'] = guess_kind.extension  # 后缀名，例如：mp4
+            res['file_type'] = guess_kind.mime  # 文件类型，例如：video/mp4
     else:
         # 文件不存在
         pass

@@ -9,5 +9,6 @@ xlrd==2.0.1
 numpy>=1.22.0
 m3u8==3.5.0
 pycryptodome==3.10.1
+filetype==1.2.0
 
 twine>=4.0.2
