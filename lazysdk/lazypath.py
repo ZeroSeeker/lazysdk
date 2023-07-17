@@ -152,6 +152,7 @@ def file_list(
         dir_file_list_f = list()
         for each in dir_file_list:
             dir_file_list_f.append(os.path.join(file_dir, each))
+        return dir_file_list_f
     else:
         return dir_file_list
 
