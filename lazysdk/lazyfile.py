@@ -290,8 +290,8 @@ def read(
         file,
         postfix: str = None,
         path: str = None,
-        silence: bool = False,
-        json_auto: bool = True
+        json_auto: bool = True,
+        read_lines: bool = False
 ):
     """
     读取文件
@@ -310,26 +310,27 @@ def read(
     else:
         # 如果没指定后缀名，就忽略
         pass
-    try:
-        if json_auto:
-            content_list = list()
-            with open(file=file_dir, mode='r', encoding='utf-8') as f:
-                content = f.readlines()
-                for each in content:
-                    each_json = json.loads(each)
-                    content_list.append(each_json)
-            return content_list
-        else:
-            f = open(file=file_dir, mode='r', encoding='utf-8')
-            res = f.read()
-            return res
 
-    except Exception as e:
-        if silence is True:
-            pass
+    if read_lines:
+        with open(file=file_dir, mode='r', encoding='utf-8') as f:
+            content = f.readlines()
+    else:
+        f = open(file=file_dir, mode='r', encoding='utf-8')
+        content = f.read()
+
+    if content:
+        if json_auto:
+            if isinstance(content, str):
+                return json.loads(content)
+            else:
+                json_content = list()
+                for each_line in content:
+                    json_content.append(json.loads(each_line))
+                return json_content
         else:
-            showlog.warning(e)
-        return
+            return content
+    else:
+        return content
 
 
 def save(
