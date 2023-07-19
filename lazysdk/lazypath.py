@@ -215,3 +215,13 @@ def file_info(
         # 文件不存在
         pass
     return res
+
+
+def delete(path_or_file):
+    """
+    删除目录/文件
+    """
+    if os.path.isdir(path_or_file):
+        shutil.rmtree(path_or_file)
+    else:
+        os.remove(path_or_file)
