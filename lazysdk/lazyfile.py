@@ -290,7 +290,7 @@ def read(
         file,
         postfix: str = None,
         path: str = None,
-        json_auto: bool = True,
+        json_auto: bool = False,
         read_lines: bool = False
 ):
     """
