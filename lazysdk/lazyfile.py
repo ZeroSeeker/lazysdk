@@ -338,7 +338,7 @@ def save(
         content,
         postfix: str = None,
         path: str = None,
-        overwrite: str = True,
+        overwrite: bool = True,
         encoding: str = 'utf-8'
 ):
     """
