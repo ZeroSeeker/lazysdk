@@ -6,6 +6,7 @@
 @ GitHub : https://github.com/ZeroSeeker
 @ Gitee : https://gitee.com/ZeroSeeker
 """
+import requests
 import datetime
 import pytz
 import time
@@ -864,3 +865,24 @@ def get_gap_days(
     date2_date = datetime.datetime.strptime(date2, data2_f).date()
     days = (date2_date - date1_date).days
     return days
+
+
+def time_limit(
+        end_datetime: str
+):
+    """
+    时间限制
+    截止时间例如：2023-07-01 12:00:00
+    """
+    url = 'http://api.m.taobao.com/rest/api3.do?api=mtop.common.getTimestamp'  # 网络取时
+    res = requests.get(url=url)
+    net_t = res.json()['data']['t']
+    end_date_t = get_datetime2timestamp(end_datetime)
+    if end_date_t * 1000 > int(net_t):
+        seconds_left = end_date_t - int(net_t)/1000
+        print(f'剩余有效时长：{format_seconds(int(seconds_left))}')
+        return
+    else:
+        while True:
+            print('软件已失效，请联系开发者～')
+            time.sleep(1)
