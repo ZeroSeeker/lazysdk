@@ -106,7 +106,7 @@ def run(
                         'process': p,  # 进程对象
                     }  # 记录开启的进程
                     if silence is False:
-                        showlog.info(f'子进程：{task_index+1}/{total_task_num} 已开启')
+                        showlog.info(f'子进程：{task_index}/{total_task_num} 已开启')
                     task_index_start += 1  # 记录累计开启进程数
 
         # 检测非活跃进程，并从active_process中剔除非活跃进程，以便开启新的进程
@@ -138,7 +138,7 @@ def run(
             # 不存在需要剔除的子进程
             pass
         if silence is False:
-            showlog.info(f'>> 当前活跃进程数：{len(active_process.keys())}')
+            showlog.info(f'>> 当前活跃进程：count:{len(active_process.keys())} --> index:{active_process.keys()}')
         else:
             pass
 
