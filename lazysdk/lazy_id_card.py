@@ -10,9 +10,9 @@ def id_info(
     奇数表示男性（例如，1、3、5、7、9）
     偶数表示女性（例如，0、2、4、6、8）
 
-通过身份证号码的性别位，我们可以快速判断持证人的性别。
+    通过身份证号码的性别位，我们可以快速判断持证人的性别。
     """
-    id_str = id_str.replace(' ', '').replace('\n', '').replace('\r', '').replace('\t', '')
+    id_str = id_str.strip(' \n\r\t')
     if len(id_str) == 18:
         pass
     else:
