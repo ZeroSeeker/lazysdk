@@ -20,3 +20,10 @@ def lazy_b64decode(s):
             s += '='
     s_decode = base64.b64decode(s=s).decode()
     return s_decode
+
+
+def lazy_b64encode(s):
+    """
+    base64编码
+    """
+    return base64.b64encode(s.encode('utf-8')).decode()
