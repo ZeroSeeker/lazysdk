@@ -11,3 +11,4 @@ pycryptodome==3.10.1
 filetype==1.2.0
 
 twine>=4.0.2
+rich==13.5.2
