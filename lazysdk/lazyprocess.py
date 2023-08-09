@@ -22,7 +22,9 @@ def run(
         subprocess_limit: int = None,
         master_process_delay: int = 1,
         return_data: bool = False,
-        silence: bool = False
+        silence: bool = False,
+        task_run_time: int = None,
+        task_over_time_reboot: bool = True
 ):
     """
     多进程 进程控制
@@ -57,6 +59,7 @@ def run(
     active_process = dict()  # 存放活跃进程进程，以task_index为key，进程信息为value的dict
     total_task_num = len(inner_task_list)  # 总任务数量
     task_index_start = 0  # 用来计算启动的累计进程数
+    task_over_time_reboot = list()
     if return_data:
         q = Queue()  # 生成一个队列对象，以实现进程通信
     else:
@@ -65,7 +68,7 @@ def run(
     if silence:
         pass
     else:
-        showlog.info(f'正在准备多进程执行任务，总任务数为：{total_task_num}，进程数限制为：{subprocess_limit}...')
+        showlog.info(f'[P-MASTER] 正在准备多进程执行任务，总任务数为：{total_task_num}，进程数限制为：{subprocess_limit}...')
     # 创建并启动进程
     while True:
         this_time_start = copy.deepcopy(task_index_start)  # 深度拷贝累积启动的进程数，以确定本次循环的起点任务序号，假设subprocess_keep为False
@@ -74,7 +77,7 @@ def run(
             if len(active_process.keys()) >= subprocess_limit:
                 # 当前活跃进程数量达到子进程数限制，本次循环不再新增进程，跳出
                 if silence is False:
-                    showlog.warning(f'达到子进程数限制：{subprocess_limit}')
+                    showlog.warning(f'[P-MASTER] 达到子进程数限制：{subprocess_limit}')
                 break
             else:
                 # 未达到进程数限制
@@ -85,7 +88,7 @@ def run(
                     # 进程不存在，待定
                     # 不存在子进程限制规则/当前活跃进程数量未达到进程数限制，将开启一个新进程
                     if silence is False:
-                        showlog.info(f'发现需要开启的子进程：{task_index}/{total_task_num}')
+                        showlog.info(f'[P-MASTER] 发现需要开启的子进程：{task_index}/{total_task_num}')
                     task_info = inner_task_list[task_index]  # 提取将开启的进程的任务内容
                     # ---------- 开启进程 ----------
                     if return_data is True:
@@ -104,9 +107,10 @@ def run(
                         'task_index': task_index,  # 任务序号
                         'task_info': task_info,  # 任务详情
                         'process': p,  # 进程对象
+                        'task_start_time': time.time()
                     }  # 记录开启的进程
                     if silence is False:
-                        showlog.info(f'子进程：{task_index}/{total_task_num} 已开启')
+                        showlog.info(f'[P-MASTER] 子进程：{task_index}/{total_task_num} 已开启')
                     task_index_start += 1  # 记录累计开启进程数
 
         # 检测非活跃进程，并从active_process中剔除非活跃进程，以便开启新的进程
@@ -117,11 +121,38 @@ def run(
             # print(q.get_nowait())
             if process_info['process'].is_alive() is True:
                 # 该子进程仍然运行
+                if task_run_time and int(time.time() - process_info['task_start_time']) > task_run_time:
+                    showlog.info(f'[P-MASTER] 子进程：{process_info["process"]} 运行超时，将关闭')
+                    inactive_process_temp.append(process_index)
+                    if task_over_time_reboot:
+                        # ---------- 开启进程 ----------
+                        if return_data is True:
+                            p = Process(
+                                target=task_function,
+                                args=(process_info['task_index'], process_info['task_info'], q)
+                            )
+                        else:
+                            p = Process(
+                                target=task_function,
+                                args=(process_info['task_index'], process_info['task_info'])
+                            )
+                        p.start()
+                        # ---------- 开启进程 ----------
+                        active_process[process_info['task_index']] = {
+                            'task_index': process_info['task_index'],  # 任务序号
+                            'task_info': process_info['task_info'],  # 任务详情
+                            'process': p,  # 进程对象
+                            'task_start_time': time.time()
+                        }  # 记录开启的进程
+                        if silence is False:
+                            showlog.info(f'[P-MASTER] 子进程：{process_info["task_index"]}/{total_task_num} 已开启')
+                    else:
+                        pass
                 continue
             else:
                 # 该子进程停止运行
                 if silence is False:
-                    showlog.warning(f'进程 {process_index} 不活跃，将被剔除...')
+                    showlog.warning(f'[P-MASTER] 进程 {process_index} 不活跃，将被剔除...')
                 inactive_process_temp.append(process_index)
                 # 尝试终止进程
                 # process_info['process'].terminate()
@@ -138,13 +169,13 @@ def run(
             # 不存在需要剔除的子进程
             pass
         if silence is False:
-            showlog.info(f'>> 当前活跃进程：count:{len(active_process.keys())} --> index:{active_process.keys()}')
+            showlog.info(f'[P-MASTER] 当前活跃进程：count:{len(active_process.keys())} --> index:{active_process.keys()}')
         else:
             pass
 
         if task_index_start >= len(inner_task_list) and len(active_process.keys()) == 0:
             if silence is False:
-                showlog.info('全部任务执行完成')
+                showlog.info('[P-MASTER] 全部任务执行完成')
             else:
                 pass
             if subprocess_keep is True:
@@ -161,12 +192,17 @@ def task_function_demo(
         task_info,
         q=None
 ):
+    showlog.info(f'[P-{task_index}] start')
     print(task_index, task_info)
     time.sleep(1)
     q.put(task_index)
+    showlog.info(f'[P-{task_index}] finish')
 
 
 if __name__ == '__main__':
+    """
+    尝试增加对进程运行时间计时，超时的将关闭重启
+    """
     task_list_demo = [
         {'task_id': 1},
         {'task_id': 2},
