@@ -6,6 +6,7 @@
 @ GitHub : https://github.com/ZeroSeeker
 @ Gitee : https://gitee.com/ZeroSeeker
 """
+import random
 from multiprocessing import Process
 from multiprocessing import Queue
 import showlog
@@ -35,6 +36,8 @@ def run(
     :param master_process_delay: 主进程循环延时，单位为秒，默认为1秒
     :param return_data: 是否返回数据，True返回，False不返回
     :param silence: 静默模式，为True是不产生任何提示
+    :param task_run_time: 单次任务运行时长限制，单位为秒
+    :param task_over_time_reboot: 单次任务超时是否重启
 
     demo:
     def task_function(
@@ -59,7 +62,6 @@ def run(
     active_process = dict()  # 存放活跃进程进程，以task_index为key，进程信息为value的dict
     total_task_num = len(inner_task_list)  # 总任务数量
     task_index_start = 0  # 用来计算启动的累计进程数
-    task_over_time_reboot = list()
     if return_data:
         q = Queue()  # 生成一个队列对象，以实现进程通信
     else:
@@ -122,9 +124,12 @@ def run(
             if process_info['process'].is_alive() is True:
                 # 该子进程仍然运行
                 if task_run_time and int(time.time() - process_info['task_start_time']) > task_run_time:
-                    showlog.info(f'[P-MASTER] 子进程：{process_info["process"]} 运行超时，将关闭')
-                    inactive_process_temp.append(process_index)
+                    showlog.warning(f'[P-MASTER] 子进程：{process_info["task_index"]}/{total_task_num} 运行超时，正在关闭...')
+                    process_info["process"].terminate()
+                    process_info["process"].join()
+                    showlog.warning(f'[P-MASTER] 子进程：{process_info["task_index"]}/{total_task_num} 运行超时，已关闭')
                     if task_over_time_reboot:
+                        showlog.warning(f'[P-MASTER] 子进程：{process_info["task_index"]}/{total_task_num} 运行超时，正在重启...')
                         # ---------- 开启进程 ----------
                         if return_data is True:
                             p = Process(
@@ -145,18 +150,15 @@ def run(
                             'task_start_time': time.time()
                         }  # 记录开启的进程
                         if silence is False:
-                            showlog.info(f'[P-MASTER] 子进程：{process_info["task_index"]}/{total_task_num} 已开启')
+                            showlog.warning(f'[P-MASTER] 子进程：{process_info["task_index"]}/{total_task_num} 运行超时，已重启')
                     else:
                         pass
                 continue
             else:
                 # 该子进程停止运行
                 if silence is False:
-                    showlog.warning(f'[P-MASTER] 进程 {process_index} 不活跃，将被剔除...')
+                    showlog.info(f'[P-MASTER] 进程 {process_index}/{total_task_num} 不活跃，将被剔除...')
                 inactive_process_temp.append(process_index)
-                # 尝试终止进程
-                # process_info['process'].terminate()
-                # process_info['process'].join()
 
         if inactive_process_temp:
             # 存在需要剔除的子进程
@@ -193,9 +195,13 @@ def task_function_demo(
         q=None
 ):
     showlog.info(f'[P-{task_index}] start')
-    print(task_index, task_info)
-    time.sleep(1)
-    q.put(task_index)
+    # print(task_index, task_info)
+    count_down = task_info.get('count_down')
+    this_randint = random.randint(0,10)
+    print(task_index, 'this_randint:', this_randint)
+
+    time.sleep(this_randint)
+    # q.put(task_index)
     showlog.info(f'[P-{task_index}] finish')
 
 
@@ -204,21 +210,22 @@ if __name__ == '__main__':
     尝试增加对进程运行时间计时，超时的将关闭重启
     """
     task_list_demo = [
-        {'task_id': 1},
-        {'task_id': 2},
-        {'task_id': 3},
-        {'task_id': 4},
-        {'task_id': 5},
-        {'task_id': 6},
-        {'task_id': 7},
-        {'task_id': 8},
-        {'task_id': 9},
-        {'task_id': 10},
-        {'task_id': 11},
+        {'task_id': 1, 'count_down': 1},
+        {'task_id': 2, 'count_down': 2},
+        {'task_id': 3, 'count_down': 3},
+        {'task_id': 4, 'count_down': 4},
+        {'task_id': 5, 'count_down': 5},
+        {'task_id': 6, 'count_down': 6},
+        {'task_id': 7, 'count_down': 7},
+        {'task_id': 8, 'count_down': 8},
+        {'task_id': 9, 'count_down': 9},
+        {'task_id': 10, 'count_down': 10},
+        {'task_id': 11, 'count_down': 11},
     ]
     run(
         task_list=task_list_demo,
         task_function=task_function_demo,
-        return_data=True,
+        task_run_time=5
+        # return_data=True,
         # silence=True
     )
