@@ -9,6 +9,8 @@
 import requests
 import showlog
 import time
+from urllib import parse
+
 
 
 def lazy_requests(
@@ -77,3 +79,18 @@ def lazy_requests(
                 break
             else:
                 pass
+
+
+def cookie_2_dict(
+        cookie_str: str
+) -> dict:
+    """
+    将cookie str 转换为 dict
+    """
+    res = dict()
+    cookie_str_unquote = parse.unquote(cookie_str.replace('+', '%20'))
+    cookie_str_split = cookie_str_unquote.split(';')
+    for each_split in cookie_str_split:
+        each_split_split = each_split.strip().split('=', 1)
+        res[each_split_split[0]] = each_split_split[1]
+    return res
