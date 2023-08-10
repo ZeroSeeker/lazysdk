@@ -5,6 +5,9 @@
 @ e-mail : zeroseeker@foxmail.com
 @ GitHub : https://github.com/ZeroSeeker
 @ Gitee : https://gitee.com/ZeroSeeker
+
+相关文档：
+https://docs.python.org/zh-cn/3/library/multiprocessing.html
 """
 import random
 from multiprocessing import Process
@@ -124,12 +127,15 @@ def run(
             if process_info['process'].is_alive() is True:
                 # 该子进程仍然运行
                 if task_run_time and int(time.time() - process_info['task_start_time']) > task_run_time:
-                    showlog.warning(f'[P-MASTER] 子进程：{process_info["task_index"]}/{total_task_num} 运行超时，正在关闭...')
+                    if not silence:
+                        showlog.warning(f'[P-MASTER] 子进程：{process_info["task_index"]}/{total_task_num} 运行超时，正在关闭...')
                     process_info["process"].terminate()
                     process_info["process"].join()
-                    showlog.warning(f'[P-MASTER] 子进程：{process_info["task_index"]}/{total_task_num} 运行超时，已关闭')
+                    if not silence:
+                        showlog.warning(f'[P-MASTER] 子进程：{process_info["task_index"]}/{total_task_num} 运行超时，已关闭')
                     if task_over_time_reboot:
-                        showlog.warning(f'[P-MASTER] 子进程：{process_info["task_index"]}/{total_task_num} 运行超时，正在重启...')
+                        if not silence:
+                            showlog.warning(f'[P-MASTER] 子进程：{process_info["task_index"]}/{total_task_num} 运行超时，正在重启...')
                         # ---------- 开启进程 ----------
                         if return_data is True:
                             p = Process(
@@ -149,7 +155,7 @@ def run(
                             'process': p,  # 进程对象
                             'task_start_time': time.time()
                         }  # 记录开启的进程
-                        if silence is False:
+                        if not silence:
                             showlog.warning(f'[P-MASTER] 子进程：{process_info["task_index"]}/{total_task_num} 运行超时，已重启')
                     else:
                         pass
