@@ -329,11 +329,20 @@ def get_datetime2timestamp(
 
 
 def get_datetime2date(
-        datetime_str: str
-):
-    datetime_timestamp = get_datetime2timestamp(datetime_str)
-    date_str = get_timestamp2date(datetime_timestamp)
-    return date_str
+        datetime_str,
+        f: str = '%Y-%m-%d'
+) -> str:
+    """
+    datetime->date
+    """
+    if isinstance(datetime_str, str):
+        datetime_timestamp = get_datetime2timestamp(datetime_str)
+        date_str = get_timestamp2date(datetime_timestamp)
+        return date_str
+    elif isinstance(datetime_str, datetime.datetime):
+        return datetime_str.strftime(f)
+    else:
+        return datetime_str
 
 
 def timestamp_day_num_start(
