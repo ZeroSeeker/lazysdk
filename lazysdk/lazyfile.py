@@ -660,3 +660,16 @@ def save_sql(
         f = open("%s%s%s.sql" % (path, path_separator, file_name), "w", encoding='utf-8')
     f.write(content)
     f.close()
+
+
+def save_bytes(
+        bytes_content: bytes,
+        file: str
+):
+    """
+    保存bytes为文件
+    """
+    with open(file, 'wb') as f:
+        f.write(bytes_content)
+    f.close()
+    return os.path.join(sys.path[0], file)
