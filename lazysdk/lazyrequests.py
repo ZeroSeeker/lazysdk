@@ -94,3 +94,21 @@ def cookie_2_dict(
         each_split_split = each_split.strip().split('=', 1)
         res[each_split_split[0]] = each_split_split[1]
     return res
+
+
+def get_requests_cookie(
+        _requests
+):
+    """
+    从requests中获取cookie信息
+    """
+    cookie_dict = dict()
+    cookie_str_list = list()
+    for cookie_key, cookie_value in _requests.cookies.items():
+        cookie_dict[cookie_key] = cookie_value
+        cookie_str_list.append(f'{cookie_key}={cookie_value}')
+    cookie_str = '; '.join(cookie_str_list)
+    return {
+        'cookie_str': cookie_str,
+        'cookie_dict': cookie_dict
+    }
