@@ -895,3 +895,19 @@ def time_limit(
         while True:
             print('软件已失效，请联系开发者～')
             time.sleep(1)
+
+
+def wait_hour(
+        hour: int,
+        sleep=0.01
+):
+    """
+    等待 小时整点，如果当前时间是指定的小时，将退出，否则将持续等待
+    hour为0-24的整数
+    sleep为等待检查的间隔时间
+    """
+    while True:
+        if datetime.datetime.now().hour == hour:
+            break
+        else:
+            time.sleep(sleep)
