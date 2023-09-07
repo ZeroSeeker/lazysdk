@@ -911,3 +911,10 @@ def wait_hour(
             break
         else:
             time.sleep(sleep)
+
+
+def get_weekday():
+    """
+    获取当前时间的星期序列，星期1为1，星期日为7
+    """
+    return datetime.datetime.now().weekday() + 1

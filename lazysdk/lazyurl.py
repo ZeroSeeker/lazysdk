@@ -33,3 +33,17 @@ def url_info(
     else:
         pass
     return url_info_dict
+
+
+def url_quote(url):
+    """
+    url编码
+    """
+    return urlparse.quote(url)
+
+
+def url_unquote(url):
+    """
+    url解码
+    """
+    return urlparse.unquote(url)
