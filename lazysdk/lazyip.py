@@ -18,3 +18,17 @@ def get_public_ip():
     response = requests.get(url=request_url)
     origin_ip = json.loads(response.text).get("origin")
     return origin_ip
+
+
+def get_local_ip():
+    """
+    获取内网ip地址
+    """
+    import socket
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(('8.8.8.8', 80))
+        ip = s.getsockname()[0]
+    finally:
+        s.close()
+    return ip
