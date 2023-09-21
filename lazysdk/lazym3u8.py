@@ -735,7 +735,7 @@ def download_m3u8_to_file(
                 lazyfile.save(
                     file=temp_filename,
                     content=m3u8_content,
-                    postfix="m3u8",
+                    suffix="m3u8",
                     path=video_save_path,
                     overwrite=overwrite
                 )
@@ -753,7 +753,7 @@ def download_m3u8_to_file(
             lazyfile.save(
                 file=temp_filename,
                 content=m3u8_file,
-                postfix="m3u8",
+                suffix="m3u8",
                 path=video_save_path,
                 overwrite=overwrite
             )

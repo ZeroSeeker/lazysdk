@@ -13,6 +13,7 @@ import json
 def get_public_ip():
     """
     获取当前网络公网ip地址
+    备用地址：http://www.3322.org/dyndns/getip
     """
     request_url = "http://httpbin.org/ip"
     response = requests.get(url=request_url)

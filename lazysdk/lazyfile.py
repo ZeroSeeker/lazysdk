@@ -20,11 +20,6 @@ import json
 import sys
 import os
 
-
-if platform.system() == 'Windows':
-    path_separator = '\\'
-else:
-    path_separator = '/'
 headers_default = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101 Firefox/68.0"}
 
 
@@ -38,7 +33,7 @@ def delete(
     """
     if path:
         # 如果指定了路径，就加上路径
-        file_dir = f'{path}{path_separator}{file}'
+        file_dir = os.path.join(path, file)
     else:
         # 如果没指定路径，就直接使用文件名
         file_dir = file
@@ -55,8 +50,7 @@ def delete(
 def get_suffix(
         file_name: str
 ):
-    suffix = file_name.split('.')[-1]  # 获取文件后缀名
-    return suffix
+    return file_name.split('.')[-1]  # 获取文件后缀名
 
 
 def file_rename(
@@ -114,12 +108,12 @@ def download(
     :param range_end:结束位置
     :return:
     """
-    if headers is None:
+    if not headers:
         headers_local = headers_default
     else:
         headers_local = headers
 
-    if range_start is None and range_end is None:
+    if not range_start and not range_end:
         range_start = 0
         range_info = None
     elif range_start is not None and range_end is None:
@@ -130,7 +124,7 @@ def download(
     else:
         range_info = 'bytes=%d-%d' % (range_start, range_end)
 
-    if range_info is None:
+    if not range_info:
         pass
     else:
         headers_local['Range'] = range_info
@@ -174,9 +168,9 @@ def download(
             pass
         else:
             os.makedirs(path)
-        path_local = path + path_separator + download_file_name
+        path_local = os.path.join(path, download_file_name)
 
-    if range_start is None:
+    if not range_start:
         temp_size = 0  # 已经下载文件大小
     else:
         temp_size = range_start + 0  # 已经下载文件大小
@@ -299,7 +293,7 @@ def read(
     """
     if path:
         # 如果指定了路径，就加上路径
-        file_dir = f'{path}{path_separator}{file}'
+        file_dir = os.path.join(path, file)
     else:
         # 如果没指定路径，就直接使用文件名
         file_dir = file
@@ -336,7 +330,7 @@ def read(
 def save(
         file,
         content,
-        postfix: str = None,
+        suffix: str = None,
         path: str = None,
         overwrite: bool = True,
         encoding: str = 'utf-8'
@@ -347,14 +341,14 @@ def save(
     if path:
         # 如果指定了路径，就加上路径
         lazypath.make_path(path)
-        file_dir = f'{path}{path_separator}{file}'
+        file_dir = os.path.join(path, file)
     else:
         # 如果没指定路径，就直接使用文件名
         file_dir = file
 
-    if postfix:
+    if suffix:
         # 如果指定了后缀名，就加上后缀名
-        file_dir = f'{file}.{postfix}'
+        file_dir = f'{file}.{suffix}'
     else:
         # 如果没指定后缀名，就忽略
         pass
@@ -371,6 +365,7 @@ def save(
     )
     f.write(content)
     f.close()
+    return file_dir
 
 
 def read_(_source_file):
@@ -576,7 +571,7 @@ def save_list(
         file_dir = "%s.%s" % (file_name, postfix)
     else:
         lazypath.make_path(path)
-        file_dir = "%s%s%s.%s" % (path, path_separator, file_name, postfix)
+        file_dir = os.path.join(path, f'{file_name}.{postfix}')
 
     if overwrite is True:
 
@@ -617,49 +612,6 @@ def dict_write07excel(path, table_name, sheet_name, data):
 
         wb.save("%s/%s.xlsx" % (path, table_name))
         showlog.info("导出数据成功！共计%s条数据" % len(data))
-
-
-def save_txt(
-        text_name,
-        content,
-        path=None,
-        overwrite=True):
-    """
-    是否覆写看overwrite参数
-    设置自动创建目录
-    """
-    if overwrite is True:
-        mode = "w"
-    else:
-        mode = "a"
-
-    if path is None:
-        f = open("%s.txt" % text_name, mode, encoding='utf-8')
-    else:
-        lazypath.make_path(path)
-        f = open("%s%s%s.txt" % (path, path_separator, text_name), mode, encoding='utf-8')
-    f.write(content)
-    f.close()
-
-
-def save_sql(
-        file_name,
-        content,
-        path=None
-):
-    """
-    如果文件存在，先清空，再保存
-    :param file_name:
-    :param content:
-    :param path:
-    :return:
-    """
-    if path is None:
-        f = open(file_name, "w", encoding='utf-8')
-    else:
-        f = open("%s%s%s.sql" % (path, path_separator, file_name), "w", encoding='utf-8')
-    f.write(content)
-    f.close()
 
 
 def save_bytes(
