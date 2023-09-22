@@ -21,61 +21,25 @@ else:
 
 def make_path(
         path: str = None,
-        overwrite: bool = False,  # 是否覆盖
-        silence: bool = False
-):
+        overwrite: bool = False
+) -> bool:
     """
-    按照目录逐级创建
+    创建目录
     """
     if path is None:
-        return
+        return False
     else:
-        path_list = str(path).split(path_separator)
-        path_temp = ""
-        for each_path in path_list:
-            path_temp = path_temp + each_path + path_separator
-            if overwrite is False:
-                if os.path.exists(path_temp) is True:
-                    if silence is True:
-                        pass
-                    else:
-                        print("==> 目录[ %s ]已存在..." % path_temp)
-                else:
-                    if silence is True:
-                        pass
-                    else:
-                        print("==> 目录[ %s ]创建中..." % path_temp)
-                    os.mkdir(path_temp)
-                    if silence is True:
-                        pass
-                    else:
-                        print("==> 目录[ %s ]创建完成..." % path_temp)
-            else:
-                if os.path.exists(path_temp) is True:
-                    if silence is True:
-                        pass
-                    else:
-                        print("==> 目录[ %s ]已存在，将覆盖..." % path_temp)
-                    shutil.rmtree(path_temp)
-                    os.mkdir(path_temp)
-                else:
-                    if silence is True:
-                        pass
-                    else:
-                        print("==> 目录[ %s ]创建中..." % path_temp)
-                    os.mkdir(path_temp)
-                    if silence is True:
-                        pass
-                    else:
-                        print("==> 目录[ %s ]创建完成..." % path_temp)
-        return path
+        if overwrite:
+            delete(path_or_file=path)
+        os.makedirs(name=path, exist_ok=True)
+        return True
 
 
 def make_data_path(
         file_name: str
 ):
     file_name = os.path.basename(file_name).replace(".py", "")
-    path = "data%s%s" % (path_separator, file_name)
+    path = os.path.join('data', file_name)
     if os.path.exists(path) is True:
         pass
     else:
