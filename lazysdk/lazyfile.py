@@ -625,3 +625,24 @@ def save_bytes(
         f.write(bytes_content)
     f.close()
     return os.path.join(sys.path[0], file)
+
+
+def get_file_info(file_dir):
+    """
+    获取文件信息
+    """
+    from lazysdk import lazytime
+    file_name = os.path.basename(file_dir)  # 获取不含路径信息的文件名
+    file_path = os.path.dirname(file_dir)  # 获取文件路径
+    file_name_pure, file_suffix = os.path.splitext(file_name)  # 获取不含后缀名的文件名和后缀名
+    return {
+        'name': file_name,  # 获取不含路径信息的文件名
+        'path': file_path,
+        'pure_name': file_name_pure,
+        'suffix': file_suffix,
+        'size': get_file_size(file_dir=file_dir),
+        'create_timestamp': os.path.getctime(file_dir),
+        'create_time': lazytime.get_timestamp2datetime(os.path.getctime(file_dir)),
+        'modified_timestamp': os.path.getmtime(file_dir),
+        'modified_time': lazytime.get_timestamp2datetime(os.path.getmtime(file_dir)),
+    }
