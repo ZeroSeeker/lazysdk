@@ -33,3 +33,12 @@ def get_local_ip():
     finally:
         s.close()
     return ip
+
+
+def get_ip():
+    """
+    获取当前网络ip地址（含有公网ip和内网ip）
+    """
+    origin_ip = get_public_ip()  # 获取公网ip
+    local_ip = get_local_ip()  # 获取内网ip
+    return {'origin_ip': origin_ip, 'local_ip': local_ip}
