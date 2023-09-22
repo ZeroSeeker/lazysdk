@@ -334,7 +334,7 @@ def save(
         path: str = None,
         overwrite: bool = True,
         encoding: str = 'utf-8'
-):
+) -> str:
     """
     保存文件
     """
