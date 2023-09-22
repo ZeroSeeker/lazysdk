@@ -6,22 +6,25 @@
 @ GitHub : https://github.com/ZeroSeeker
 @ Gitee : https://gitee.com/ZeroSeeker
 """
-import requests
-import json
 
 
-def get_public_ip():
+def get_public_ip() -> str:
     """
     获取当前网络公网ip地址
     备用地址：http://www.3322.org/dyndns/getip
     """
-    request_url = "http://httpbin.org/ip"
-    response = requests.get(url=request_url)
-    origin_ip = json.loads(response.text).get("origin")
+    import requests
+    import json
+    try:
+        request_url = "http://httpbin.org/ip"
+        response = requests.get(url=request_url)
+        origin_ip = json.loads(response.text).get("origin")
+    finally:
+        origin_ip = ''
     return origin_ip
 
 
-def get_local_ip():
+def get_local_ip() -> str:
     """
     获取内网ip地址
     """
@@ -32,10 +35,11 @@ def get_local_ip():
         ip = s.getsockname()[0]
     finally:
         s.close()
+        ip = ''
     return ip
 
 
-def get_ip():
+def get_ip() -> dict:
     """
     获取当前网络ip地址（含有公网ip和内网ip）
     """
