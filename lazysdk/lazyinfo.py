@@ -42,4 +42,7 @@ def platform_info() -> dict:
 
     res["cpu_count"] = os.cpu_count()
 
+    import locale
+    res["encoding"] = locale.getpreferredencoding()  # 获取系统编码类型
+
     return res
