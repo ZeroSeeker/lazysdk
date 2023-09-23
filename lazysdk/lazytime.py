@@ -918,3 +918,16 @@ def get_weekday():
     获取当前时间的星期序列，星期1为1，星期日为7
     """
     return datetime.datetime.now().weekday() + 1
+
+
+def get_recent_days_date(
+        num_start: int = -1,
+        num_end: int = 0
+) -> list:
+    """
+    获取指定前推天数的日期列表
+    """
+    return date_str_list(
+        start_date=get_date_string(days=num_start),
+        end_date=get_date_string(days=num_end)
+    )
