@@ -6,6 +6,8 @@
 @ GitHub : https://github.com/ZeroSeeker
 @ Gitee : https://gitee.com/ZeroSeeker
 """
+import copy
+
 from . import lazypath
 import collections
 import subprocess
@@ -19,6 +21,7 @@ import xlrd
 import json
 import sys
 import os
+import zipfile
 
 headers_default = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101 Firefox/68.0"}
 
@@ -632,8 +635,8 @@ def get_file_info(file_dir):
     获取文件信息
     """
     from lazysdk import lazytime
-    file_name = os.path.basename(file_dir)  # 获取不含路径信息的文件名
     file_path = os.path.dirname(file_dir)  # 获取文件路径
+    file_name = os.path.basename(file_dir)  # 获取不含路径信息的文件名
     file_name_pure, file_suffix = os.path.splitext(file_name)  # 获取不含后缀名的文件名和后缀名
     return {
         'name': file_name,  # 获取不含路径信息的文件名
@@ -646,3 +649,119 @@ def get_file_info(file_dir):
         'modified_timestamp': os.path.getmtime(file_dir),
         'modified_time': lazytime.get_timestamp2datetime(os.path.getmtime(file_dir)),
     }
+
+
+def zip_file(
+        source_file: str,
+        zip_file: str = None
+) -> str:
+    """
+    压缩文件，此方法只适用于压缩单个文件，不适合压缩文件夹
+    """
+    import zipfile
+    file_path = os.path.dirname(source_file)
+    file_name = os.path.basename(source_file)
+    file_name_pure, file_suffix = os.path.splitext(file_name)
+    if not zip_file:
+        zip_file = os.path.join(file_path, f'{file_name_pure}.zip')
+    my_zip = zipfile.ZipFile(
+        file=zip_file,  # 打开一个对象，也就是目标文件名
+        mode='w'  # 写入模式
+    )
+    my_zip.write(
+        filename=source_file,  # 压缩目标文件路径
+        arcname=os.path.basename(source_file),  # 内部文件名
+        compress_type=zipfile.ZIP_DEFLATED
+    )
+    my_zip.close()
+    return zip_file
+
+
+def zip_path(
+        source_path
+) -> str:
+    """
+    压缩文件夹，并在原来的同级目录输出，返回zip文件路径
+    """
+    import shutil
+    return shutil.make_archive(
+        root_dir=source_path,
+        base_name=source_path,
+        format='zip'
+    )
+
+
+def make_zip(
+        file: str
+) -> str:
+    """
+    创建压缩文件，自动判断源是文件还是路径
+    """
+    if os.path.isdir(file):
+        return zip_path(file)
+    elif os.path.isfile(file):
+        return zip_file(file)
+    else:
+        return ''
+
+
+def unzip(
+        file
+) -> list:
+    """
+    解压文件，会在源文件的同级目录增加一个路径，以存放解压后的文件
+    返回的是一个已解压的所有文件路径的list
+    """
+    import zipfile
+    import locale
+    file_path = os.path.dirname(file)
+    file_name = os.path.basename(file)
+    file_name_pure, file_suffix = os.path.splitext(file_name)
+    encoding = locale.getpreferredencoding()
+    my_zip = zipfile.ZipFile(
+        file=file,
+        mode='r'
+    )
+    unzip_path = os.path.join(file_path, file_name_pure)
+    while True:
+        if os.path.exists(unzip_path):
+            unzip_path = f'{unzip_path}_unpack'
+        else:
+            break
+
+    # 生成一个源文件名对照正确文件名的字典
+    name_dict = dict()
+    for each in my_zip.filelist:
+        each_filename = copy.deepcopy(each.filename)
+        if each_filename[0:8] == '__MACOSX':
+            continue  # 屏蔽mac下的__MACOSX路径
+        else:
+            if each_filename.isascii():
+                pass   # 如果isascii=True，则不改编码
+            else:
+                try:
+                    each_filename = each_filename.encode('437').decode(encoding)  # 尝试使用437编码先解码，再编码
+                except:
+                    pass
+            name_dict[each.filename] = each_filename
+
+    unzip_names = list()
+    for each_name in my_zip.namelist():
+        new_name = name_dict.get(each_name)
+        if new_name:
+            new_name_dir = os.path.join(unzip_path, new_name)
+            extract_name = my_zip.extract(
+                member=each_name,
+                path=unzip_path
+            )
+            if extract_name == new_name_dir:
+                # print(extract_name)
+                pass
+            else:
+                # print(extract_name, '-->', new_name_dir)
+                os.renames(old=extract_name, new=new_name_dir)  # 对乱码文件名重命名
+                if os.path.isfile(new_name_dir):
+                    unzip_names.append(new_name_dir)
+        else:
+            continue
+    return unzip_names
