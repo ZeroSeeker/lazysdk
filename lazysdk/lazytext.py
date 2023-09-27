@@ -67,3 +67,11 @@ def path_clean(content):
     else:
         pass
     return content
+
+
+def file_name_format(text):
+    """
+    对文件名处理，避免特殊字符导致的无法存储的问题
+    """
+    text_new = re.sub(r'[\\/:*?"<>|\r\n]+', "_", text)  # 规避windows非法字符
+    return text_new

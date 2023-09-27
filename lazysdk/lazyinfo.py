@@ -2,6 +2,7 @@ import platform
 import datetime
 import socket
 import os
+import hashlib
 
 
 def get_mac_address() -> str:
@@ -60,3 +61,39 @@ def platform_info() -> dict:
     res["encoding"] = locale.getpreferredencoding()  # 获取系统编码类型
 
     return res
+
+
+def equipment_calibration(detail=False):
+    import wmi
+    c = wmi.WMI()
+
+    # 硬盘序列号
+    equipment_information_pre = ''
+    equipment_information_list = []
+    for physical_disk in c.Win32_DiskDrive():
+        equipment_information_pre = equipment_information_pre + physical_disk.SerialNumber
+        equipment_information_list.append(physical_disk.SerialNumber)
+
+    # CPU序列号
+    cpu_information_list = []
+    for cpu in c.Win32_Processor():
+        equipment_information_pre = equipment_information_pre + cpu.ProcessorId.strip()
+        cpu_information_list.append(cpu.ProcessorId.strip())
+
+    # 主板序列号
+    main_board_information_list = []
+    for board_id in c.Win32_BaseBoard():
+        equipment_information_pre = equipment_information_pre + board_id.SerialNumber
+        main_board_information_list.append(board_id.SerialNumber)
+
+    equipment_information = hashlib.md5(equipment_information_pre.encode(encoding='UTF-8')).hexdigest()
+
+    if detail:
+        return {
+            'hard_disk': equipment_information_list,
+            'cpu': cpu_information_list,
+            'main_board': main_board_information_list,
+            'equipment_code': equipment_information
+        }
+    else:
+        return equipment_information
