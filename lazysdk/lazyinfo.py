@@ -1,16 +1,30 @@
 import platform
 import datetime
 import socket
-import uuid
 import os
 
 
 def get_mac_address() -> str:
     """
-    获取mac地址
+    获取mac地址，只有联网才能生效
     """
-    mac = uuid.UUID(int=uuid.getnode()).hex[-12:]
-    return ":".join([mac[e:e+2] for e in range(0, 11, 2)])
+    import netifaces
+    try:
+        default_gate_way, default_nic_name = netifaces.gateways()['default'][netifaces.AF_INET]  # 获取默认网关和网卡名称
+        default_nic_mac_addr = netifaces.ifaddresses(default_nic_name)[netifaces.AF_LINK][0]['addr']  # 默认网卡的mac地址
+        return default_nic_mac_addr
+    except:
+        return ''
+
+
+def get_net_info():
+    import netifaces
+    default_gate_way, default_nic_name = netifaces.gateways()['default'][netifaces.AF_INET]  # 获取默认网关和网卡名称
+    default_nic_mac_addr = netifaces.ifaddresses(default_nic_name)[netifaces.AF_LINK][0]['addr']  # 默认网卡的mac地址
+    default_ip_addr = netifaces.ifaddresses(default_nic_name)[netifaces.AF_INET][0]['addr']  # 本地ip
+    default_ip_netmask = netifaces.ifaddresses(default_nic_name)[netifaces.AF_INET][0]['netmask']  # 子网掩码
+    default_ip_broadcast = netifaces.ifaddresses(default_nic_name)[netifaces.AF_INET][0]['netmask']
+    return {'mac': default_nic_mac_addr, 'local_ip': default_ip_addr, 'netmask': default_ip_netmask, 'broadcast': default_ip_broadcast}
 
 
 def platform_info() -> dict:
