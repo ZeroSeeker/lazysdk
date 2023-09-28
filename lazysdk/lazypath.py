@@ -189,3 +189,33 @@ def delete(path_or_file):
         shutil.rmtree(path_or_file)
     else:
         os.remove(path_or_file)
+
+
+def get_folder_name(dir_or_path: str):
+    """
+    获取文件夹名称
+    """
+    if os.path.isdir(dir_or_path):
+        # 这里多做一步处理，避免有可能路径后面再有个路径分割符号不能识别的情况
+        return os.path.basename(os.path.abspath(dir_or_path))
+    elif os.path.isfile(dir_or_path):
+        tmp_dir = os.path.dirname(dir_or_path)
+        return os.path.basename(tmp_dir)
+    else:
+        return
+
+
+def path_rename(
+        folder_path,
+        new_folder_name
+):
+    """
+    文件夹重命名
+    """
+    if os.path.isdir(folder_path):
+        second_last_path, last_path = os.path.split(os.path.abspath(folder_path))
+        new_path = os.path.join(second_last_path, new_folder_name)
+        os.rename(folder_path, new_path)
+        return new_path
+    else:
+        return
