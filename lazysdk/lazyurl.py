@@ -56,7 +56,10 @@ def domain_split(url):
     domain_2: 二级域名
     """
     import urllib
-    netloc = urllib.parse.urlparse(url).netloc
+    if 'http' in url:
+        netloc = urllib.parse.urlparse(url).netloc
+    else:
+        netloc = url
     netloc_split = netloc.split('.')
     domain_dict = dict()
     for _ in range(len(netloc_split)):
