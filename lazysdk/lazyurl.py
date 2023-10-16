@@ -47,3 +47,18 @@ def url_unquote(url):
     url解码
     """
     return urlparse.unquote(url)
+
+
+def domain_split(url):
+    """
+    对输入的url分析域名，拆分域名
+    domain_1: 顶级域名
+    domain_2: 二级域名
+    """
+    import urllib
+    netloc = urllib.parse.urlparse(url).netloc
+    netloc_split = netloc.split('.')
+    domain_dict = dict()
+    for _ in range(len(netloc_split)):
+        domain_dict[f'domain_{_+1}'] = '.'.join(netloc_split[-_ - 1:])
+    return domain_dict
