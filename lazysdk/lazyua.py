@@ -7,6 +7,7 @@
 @ Gitee : https://gitee.com/ZeroSeeker
 """
 from ua_parser import user_agent_parser
+from user_agents import parse
 ua_match_ignore_values = ['Other', None]
 
 
@@ -119,3 +120,35 @@ def ua_similarity(
             return 0
         else:
             return count_match/count_all
+
+
+def ua_match(
+        ua1: str,
+        ua2: str,
+        match_os: bool = True,
+        match_device: bool = True
+):
+    """
+    按照os和device匹配信息，匹配成功返回True，匹配失败返回False
+    """
+    user_agent1 = parse(ua1)
+    user_agent2 = parse(ua2)
+    user_agent1_os = user_agent1.os
+    user_agent1_device = user_agent1.device
+    user_agent2_os = user_agent2.os
+    user_agent2_device = user_agent2.device
+    if match_os and match_device:
+        user_agent1_str = str(user_agent1_os) + str(user_agent1_device)
+        user_agent2_str = str(user_agent2_os) + str(user_agent2_device)
+    elif match_os and not match_device:
+        user_agent1_str = str(user_agent1_os)
+        user_agent2_str = str(user_agent2_os)
+    elif not match_os and match_device:
+        user_agent1_str = str(user_agent1_device)
+        user_agent2_str = str(user_agent2_device)
+    else:
+        return False
+    if user_agent1_str == user_agent2_str:
+        return True
+    else:
+        return False

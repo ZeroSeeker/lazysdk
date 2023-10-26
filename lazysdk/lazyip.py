@@ -6,6 +6,7 @@
 @ GitHub : https://github.com/ZeroSeeker
 @ Gitee : https://gitee.com/ZeroSeeker
 """
+import requests
 
 
 def get_public_ip() -> str:
@@ -46,3 +47,13 @@ def get_ip() -> dict:
     origin_ip = get_public_ip()  # 获取公网ip
     local_ip = get_local_ip()  # 获取内网ip
     return {'origin_ip': origin_ip, 'local_ip': local_ip}
+
+
+def get_ip_addr(ip: str):
+    """
+    查询ip归属地
+    """
+    api_url = f'http://whois.pconline.com.cn/ipJson.jsp?ip={ip}&json=true'
+    response = requests.get(api_url)
+    addr = response.json()['addr']
+    return addr
