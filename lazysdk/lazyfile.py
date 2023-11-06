@@ -351,7 +351,7 @@ def save(
 
     if suffix:
         # 如果指定了后缀名，就加上后缀名
-        file_dir = f'{file}.{suffix}'
+        file_dir = f'{file_dir}.{suffix}'
     else:
         # 如果没指定后缀名，就忽略
         pass
