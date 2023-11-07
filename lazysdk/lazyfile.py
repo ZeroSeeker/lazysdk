@@ -97,6 +97,7 @@ def download(
         size_limit: int = None,
         range_start: int = None,
         range_end: int = None,
+        overwrite: bool = False
 ):
     """
     实现文件下载功能，可指定url、文件名、后缀名、请求头、文件保存路径
@@ -109,6 +110,7 @@ def download(
     :param size_limit:尺寸限制
     :param range_start:开始位置
     :param range_end:结束位置
+    :param overwrite: 覆盖
     :return:
     """
     if not headers:
@@ -192,6 +194,9 @@ def download(
     time_start = time.time()  # 获取下载开始时间
     is_finish = False
 
+    if overwrite and os.path.exists(path_local):
+        delete(file=path_local)
+
     with open(path_local, "ab") as f:  # wb新建文件，a追加
         for chunk in response.iter_content(chunk_size=chunk_size):
             try:
@@ -261,6 +266,8 @@ def safe_download(
         range_start=None,
         range_end=None
 ):
+    overwrite = False
+    overwrite_range_start = copy.deepcopy(range_start)
     while True:
         try:
             download_response = download(
@@ -272,7 +279,8 @@ def safe_download(
                 proxies=proxies,
                 size_limit=size_limit,
                 range_start=range_start,
-                range_end=range_end
+                range_end=range_end,
+                overwrite=overwrite
             )
             if download_response.get('is_finish') is True:
                 local_file_dir = download_response.get('file_dir')
@@ -282,9 +290,12 @@ def safe_download(
                 range_start = download_response.get('temp_size')
                 time.sleep(1)
                 print('将继续下载（断点续传）...')
+                overwrite = False
         except:
             print(':( 下载中断，将重新下载')
             time.sleep(1)
+            overwrite = True
+            range_start = copy.deepcopy(overwrite_range_start)
 
 
 def read(
