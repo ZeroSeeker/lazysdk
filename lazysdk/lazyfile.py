@@ -97,7 +97,8 @@ def download(
         size_limit: int = None,
         range_start: int = None,
         range_end: int = None,
-        overwrite: bool = False
+        overwrite: bool = False,
+        verify: bool = False
 ):
     """
     实现文件下载功能，可指定url、文件名、后缀名、请求头、文件保存路径
@@ -138,7 +139,8 @@ def download(
         url=url,
         headers=headers_local,
         stream=True,
-        proxies=proxies
+        proxies=proxies,
+        verify=verify
     )
     total_length = response.headers.get('content-length')  # 文件大小
     content_type = response.headers.get('content-type')  # 文件类型
@@ -264,10 +266,9 @@ def safe_download(
         proxies=None,
         size_limit=None,
         range_start=None,
-        range_end=None
+        range_end=None,
+        verify: bool = False
 ):
-    overwrite = False
-    overwrite_range_start = copy.deepcopy(range_start)
     while True:
         try:
             download_response = download(
@@ -280,7 +281,8 @@ def safe_download(
                 size_limit=size_limit,
                 range_start=range_start,
                 range_end=range_end,
-                overwrite=overwrite
+                overwrite=False,
+                verify=verify
             )
             if download_response.get('is_finish') is True:
                 local_file_dir = download_response.get('file_dir')
@@ -290,12 +292,9 @@ def safe_download(
                 range_start = download_response.get('temp_size')
                 time.sleep(1)
                 print('将继续下载（断点续传）...')
-                overwrite = False
         except:
-            print(':( 下载中断，将重新下载')
+            print(':( 下载中断，将重新下载...')
             time.sleep(1)
-            overwrite = True
-            range_start = copy.deepcopy(overwrite_range_start)
 
 
 def read(
