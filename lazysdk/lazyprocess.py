@@ -26,7 +26,7 @@ def run(
         subprocess_limit: int = None,
         master_process_delay: int = 1,
         return_data: bool = False,
-        silence: bool = False,
+        silence: bool = True,
         task_run_time: int = None,
         task_over_time_reboot: bool = True
 ):
@@ -82,7 +82,7 @@ def run(
             if len(active_process.keys()) >= subprocess_limit:
                 # 当前活跃进程数量达到子进程数限制，本次循环不再新增进程，跳出
                 if silence is False:
-                    showlog.warning(f'[P-MASTER] 达到子进程数限制：{subprocess_limit}')
+                    showlog.info(f'[P-MASTER] 达到子进程数限制：{subprocess_limit}')
                 break
             else:
                 # 未达到进程数限制
