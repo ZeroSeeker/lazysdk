@@ -262,25 +262,29 @@ def safe_download(
         range_end=None
 ):
     while True:
-        download_response = download(
-            url=url,
-            filename=filename,
-            suffix_name=suffix_name,
-            headers=headers,
-            path=path,
-            proxies=proxies,
-            size_limit=size_limit,
-            range_start=range_start,
-            range_end=range_end
-        )
-        if download_response.get('is_finish') is True:
-            local_file_dir = download_response.get('file_dir')
-            return local_file_dir
-        else:
-            print(':( 下载中断')
-            range_start = download_response.get('temp_size')
+        try:
+            download_response = download(
+                url=url,
+                filename=filename,
+                suffix_name=suffix_name,
+                headers=headers,
+                path=path,
+                proxies=proxies,
+                size_limit=size_limit,
+                range_start=range_start,
+                range_end=range_end
+            )
+            if download_response.get('is_finish') is True:
+                local_file_dir = download_response.get('file_dir')
+                return local_file_dir
+            else:
+                print(':( 下载中断')
+                range_start = download_response.get('temp_size')
+                time.sleep(1)
+                print('将继续下载（断点续传）...')
+        except:
+            print(':( 下载中断，将重新下载')
             time.sleep(1)
-            print('将继续下载（断点续传）...')
 
 
 def read(
