@@ -98,7 +98,7 @@ def download(
         range_start: int = None,
         range_end: int = None,
         overwrite: bool = False,
-        verify: bool = False
+        verify: bool = True
 ):
     """
     实现文件下载功能，可指定url、文件名、后缀名、请求头、文件保存路径
@@ -112,6 +112,7 @@ def download(
     :param range_start:开始位置
     :param range_end:结束位置
     :param overwrite: 覆盖
+    :param verify: 验证证书
     :return:
     """
     if not headers:
