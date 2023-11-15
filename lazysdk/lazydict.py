@@ -231,3 +231,15 @@ def list_same_order_dict(
             each_dict_order[each_key] = each_dict.get(each_key, na_value)
         list_data_f.append(each_dict_order)
     return list_data_f
+
+
+def list_dict_filter(
+        list_in: list,
+        filter_key,
+        filter_value
+):
+    """
+    从[{},{}]中按照某个key-value条件筛选出符合条件的记录
+    """
+    list_out = list(filter(lambda x: x[filter_key] == filter_value, list_in))
+    return list_out
