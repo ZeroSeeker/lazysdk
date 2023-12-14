@@ -199,6 +199,19 @@ def download(
 
     if overwrite and os.path.exists(path_local):
         delete(file=path_local)
+    elif not overwrite and os.path.exists(path_local):
+        # 这里将对已存在的文件名重新命名
+        rename_count = 1
+        while True:
+            path_local_rename = os.path.join(path, download_file_name, "(", str(rename_count), ")")
+            if os.path.exists(path_local):
+                rename_count += 1
+                continue
+            else:
+                break
+        path_local = copy.deepcopy(path_local_rename)
+    else:
+        pass
 
     with open(path_local, "ab") as f:  # wb新建文件，a追加
         for chunk in response.iter_content(chunk_size=chunk_size):
