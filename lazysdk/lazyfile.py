@@ -203,8 +203,9 @@ def download(
         # 这里将对已存在的文件名重新命名
         rename_count = 1
         while True:
-            path_local_rename = os.path.join(path, download_file_name, "(", str(rename_count), ")")
-            if os.path.exists(path_local):
+            download_file_name_rename = f'{download_file_name.split(".")[0]}({rename_count}).{download_file_name.split(".")[1]}'
+            path_local_rename = os.path.join(path, download_file_name_rename)
+            if os.path.exists(path_local_rename):
                 rename_count += 1
                 continue
             else:
