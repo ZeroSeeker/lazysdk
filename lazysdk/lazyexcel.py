@@ -125,8 +125,8 @@ def read_xlsx(
     table_data_dict = OrderedDict()  # 有序字典
     table_data = openpyxl.load_workbook(file)  # 加载表内容
     sheets = table_data.worksheets
-    if not sheet_name and sheet_index:
-        target_sheet = sheets[sheet_index]
+    if sheet_name is None and sheet_index is not None:
+        target_sheet = sheets[sheet_index].title
     elif sheet_name and not sheet_index:
         target_sheet = sheet_name
     elif sheet_name and sheet_index:
