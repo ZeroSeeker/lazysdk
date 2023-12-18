@@ -99,9 +99,10 @@ def read_xls(
 def read_xlsx(
         file: str,
         sheet_name: str = None,
+        sheet_index: int = None,
         date_cols: dict = None,
         auto_conv_date: bool = False  # 默认格式：'%Y-%m-%d %H:%M:%S'
-) -> dict:
+):
     """
     读取xlsx表格
     :param file: 文件路径
@@ -109,7 +110,7 @@ def read_xlsx(
     :param date_cols: 按照既定规则转换时间，例如：{'日期': '%Y-%m-%d','时间': '%H:%M:%S'}，就会将表中对应字段转换为对应格式的字符串
     :param auto_conv_date: 自动转换，会将时间类型的数据自动转换为默认格式的字符串
 
-    :returns: 读取结果字典，字典的第一层key为sheet_name
+    :returns: 读取结果字典，字典的第一层key为sheet_name，如果指定了读取哪个sheet，则只返回值list
 
     cell(a,b).data_type 值类型
     n None
@@ -122,12 +123,22 @@ def read_xlsx(
     else:
         data_cols_cols = date_cols.keys()
     table_data_dict = OrderedDict()  # 有序字典
-    table_data = openpyxl.load_workbook(file)  # 打开表
-    for each_sheet in table_data.worksheets:  # 遍历所有sheet
-        if sheet_name is None:
+    table_data = openpyxl.load_workbook(file)  # 加载表内容
+    sheets = table_data.worksheets
+    if not sheet_name and sheet_index:
+        target_sheet = sheets[sheet_index]
+    elif sheet_name and not sheet_index:
+        target_sheet = sheet_name
+    elif sheet_name and sheet_index:
+        return 'sheet_name和sheet_index不可同时指定'
+    else:
+        target_sheet = None
+
+    for each_sheet in sheets:  # 遍历所有sheet
+        if not target_sheet:
             pass
         else:
-            if each_sheet.title == sheet_name:  # 判断当前的sheet是否是需要获取数据的sheet
+            if each_sheet.title == target_sheet:  # 判断当前的sheet是否是需要获取数据的sheet
                 pass
             else:
                 continue
@@ -168,7 +179,10 @@ def read_xlsx(
                 pass
             sheet_data_list.append(each_row_data)  # 将每一行的数据dict组织到当前sheet的数据list中
         table_data_dict[each_sheet.title] = sheet_data_list  # 将每个sheet的数据组织到table_data_dict里面
-    return table_data_dict
+    if target_sheet:
+        return table_data_dict[target_sheet]
+    else:
+        return table_data_dict
 
 
 def read(
