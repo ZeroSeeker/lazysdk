@@ -22,7 +22,7 @@ def show_df(df):
     x = PrettyTable()
     # x.padding_width = 1  # One space between column edges and contents (default)
     x.add_column(
-        fieldname='dates',
+        fieldname='data_index',
         column=df.index
     )
     for col in df.columns.values:  # df.columns.values的意思是获取列的名称
