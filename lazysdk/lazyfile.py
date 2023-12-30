@@ -338,6 +338,9 @@ def read(
         # 如果没指定后缀名，就忽略
         pass
 
+    if not os.path.exists(file_dir):
+        return
+
     if read_lines:
         with open(file=file_dir, mode='r', encoding='utf-8') as f:
             content = f.readlines()
