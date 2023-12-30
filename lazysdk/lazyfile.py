@@ -22,6 +22,7 @@ import json
 import sys
 import os
 import zipfile
+from requests import exceptions
 
 headers_default = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101 Firefox/68.0"}
 
@@ -686,3 +687,26 @@ def unzip(
         else:
             continue
     return unzip_names
+
+
+def get_stream(
+        url,
+        verify=True,
+        **kwargs
+):
+    """
+    以流式传输方式发起请求，适用于下载文件时，当文件过大，不会立即下载。
+    当把get函数的stream参数设置成True时，它不会立即开始下载，当你使用iter_content或iter_lines遍历内容或访问内容属性时才开始下载。需要注意一点：文件没有下载之前，它也需要保持连接。
+    iter_content：一块一块的遍历要下载的内容
+    iter_lines：一行一行的遍历要下载的内容
+    """
+    try:
+        response = requests.get(
+            url=url,
+            verify=verify,
+            stream=True,
+            **kwargs
+        )
+    except exceptions.ConnectionError:
+        raise exceptions.ConnectionError(f"Could not reach host. Are you offline?")
+    return response
