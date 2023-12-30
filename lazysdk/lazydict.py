@@ -243,3 +243,43 @@ def list_dict_filter(
     """
     list_out = list(filter(lambda x: x[filter_key] == filter_value, list_in))
     return list_out
+
+
+def key_max_value(
+        list_in: list,
+        key
+):
+    """
+    求list嵌套的dict中某个key的最大值
+    """
+    max_value = None
+    for each in list_in:
+        key_value = each.get(key)
+        if key_value:
+            if max_value is None or key_value > max_value:
+                max_value = copy.deepcopy(key_value)
+            else:
+                continue
+        else:
+            continue
+    return max_value
+
+
+def key_min_value(
+        list_in: list,
+        key
+):
+    """
+    求list嵌套的dict中某个key的最小值
+    """
+    min_value = None
+    for each in list_in:
+        key_value = each.get(key)
+        if key_value:
+            if min_value is None or key_value < min_value:
+                min_value = copy.deepcopy(key_value)
+            else:
+                continue
+        else:
+            continue
+    return min_value
