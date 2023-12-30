@@ -4,6 +4,7 @@
 
 #### 介绍
 基于Python3的懒人包
+详细文档见：https://gzcaxecc4u.feishu.cn/docx/EaymdTdIQolphcxgD2jcMsjJn6c
 
 #### 软件架构
 软件架构说明
