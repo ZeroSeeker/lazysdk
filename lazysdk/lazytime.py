@@ -114,7 +114,7 @@ def get_day(
 
 def get_hour(
         target=None
-):
+) -> int:
     """
     获取当前系统的当前时间：小时数（24小时制）
     :return: 14
@@ -127,9 +127,9 @@ def get_hour(
         elif isinstance(target, str):
             get_res = get_datetime_from_str(string=target)
             if get_res.get("time"):
-                return get_res.get("time")[0].split(':')[0]
+                return int(get_res.get("time")[0].split(':')[0])
         else:
-            return
+            return -1
 
 
 def get_minute():
