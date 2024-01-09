@@ -12,6 +12,22 @@ import pytz
 import time
 import copy
 import sys
+import re
+
+
+def get_datetime_from_str(
+        string: str
+):
+    """
+    从字符串中识别出时间
+    目前这个模块还不完备
+    """
+    findres = dict()
+    find_datetime = re.findall(pattern=r'(\d\d\d\d-[0-1]\d-[0-3]\d [0-2]\d:[0-5]\d:[0-5]\d)', string=string)
+    findres['datetime'] = find_datetime
+    find_time = re.findall(pattern=r'([0-2]\d:[0-5]\d:[0-5]\d)', string=string)
+    findres['time'] = find_time
+    return findres
 
 
 def get_utc_datetime(
@@ -96,13 +112,24 @@ def get_day(
     return day
 
 
-def get_hour():
+def get_hour(
+        target=None
+):
     """
     获取当前系统的当前时间：小时数（24小时制）
     :return: 14
     """
-    hour = datetime.datetime.now().hour
-    return hour
+    if not target:
+        return datetime.datetime.now().hour
+    else:
+        if isinstance(target, datetime.datetime):
+            return target.hour
+        elif isinstance(target, str):
+            get_res = get_datetime_from_str(string=target)
+            if get_res.get("time"):
+                return get_res.get("time")[0].split(':')[0]
+        else:
+            return
 
 
 def get_minute():
