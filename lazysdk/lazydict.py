@@ -78,18 +78,21 @@ def dict_list_group(list_in, by):
     :param by:
     :return:
     """
-    by_list = list()
-    for each_dict in list_in:
-        by_value = each_dict.get(by)
-        by_list.append(by_value)
-    by_set = set(by_list)
-    group_dict = dict()
-    for each_by in by_set:
-        group_dict[each_by] = list()
-    for each_dict in list_in:
-        by_value = each_dict.get(by)
-        group_dict[by_value].extend([each_dict])
-    return group_dict
+    if not list_in:
+        return
+    else:
+        by_list = list()
+        for each_dict in list_in:
+            by_value = each_dict.get(by)
+            by_list.append(by_value)
+        by_set = set(by_list)
+        group_dict = dict()
+        for each_by in by_set:
+            group_dict[each_by] = list()
+        for each_dict in list_in:
+            by_value = each_dict.get(by)
+            group_dict[by_value].extend([each_dict])
+        return group_dict
 
 
 def dict_key_f(in_dict):
