@@ -14,7 +14,10 @@ class LazyEncoder(json.JSONEncoder):
         super(LazyEncoder, self).default(obj)
 
 
-def json2str(data: json):
+def json2str(
+        data: json,
+        ensure_ascii: bool = False
+):
     """
     在将json数据反序列化为str时，会遇到一些格式无法转换
     这里使用识别类型转换转为str
@@ -23,4 +26,8 @@ def json2str(data: json):
     datetime.datetime --> str(%Y-%m-%d %H:%M:%S)
     datetime.date --> str(%Y-%m-%d)
     """
-    return json.dumps(data, cls=LazyEncoder)
+    return json.dumps(
+        data,
+        cls=LazyEncoder,
+        ensure_ascii=ensure_ascii
+    )
