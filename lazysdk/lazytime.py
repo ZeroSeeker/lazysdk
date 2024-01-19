@@ -619,12 +619,28 @@ def datetime_string_chs(
 
 
 def date_str_list(
-        start_date: str,
-        end_date: str
+        start_date: str = None,
+        end_date: str = None,
+        start_days: int = None,
+        end_days: int = None
 ):
     # 生成起止时间之间的时间序列
-    start_date_f = get_format_date(start_date)
-    end_date_f = get_format_date(end_date)
+    current_day = datetime.date.today()
+
+    if start_date:
+        start_date_f = get_format_date(start_date)
+    elif start_days:
+        start_date_f = current_day + datetime.timedelta(days=start_days)
+    else:
+        start_date_f = current_day
+
+    if end_date:
+        end_date_f = get_format_date(end_date)
+    elif end_days:
+        end_date_f = current_day + datetime.timedelta(days=end_days)
+    else:
+        end_date_f = current_day
+    # print(start_date_f, '-->', end_date_f)
     date_list = list()
     date_list.append(str(start_date_f))
     added_date = start_date_f
