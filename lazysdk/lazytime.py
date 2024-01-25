@@ -362,14 +362,15 @@ def get_datetime2date(
     """
     datetime->date
     """
-    if isinstance(datetime_str, str):
-        datetime_timestamp = get_datetime2timestamp(datetime_str)
+    temp = copy.deepcopy(datetime_str)  # 复制一份防止发生更改
+    if isinstance(temp, str):
+        datetime_timestamp = get_datetime2timestamp(temp)
         date_str = get_timestamp2date(datetime_timestamp)
         return date_str
-    elif isinstance(datetime_str, datetime.datetime):
-        return datetime_str.strftime(f)
+    elif isinstance(temp, datetime.datetime):
+        return temp.strftime(f)
     else:
-        return datetime_str
+        return temp
 
 
 def timestamp_day_num_start(
