@@ -7,6 +7,7 @@
 @ Gitee : https://gitee.com/ZeroSeeker
 """
 import decimal
+import json
 from collections import OrderedDict
 from . import lazydict
 import openpyxl  # 用于处理.xlsx，文档：https://openpyxl.readthedocs.io/en/stable/
@@ -335,10 +336,13 @@ def save_xlsx(
                 for each in sheet_data_f:
                     col_num = 1
                     for key in each:
+                        value = each.get(key)
+                        if isinstance(value, dict) or isinstance(value, list):
+                            value = json.dumps(value, ensure_ascii=False)
                         sheet.cell(
                             row=row_num,
                             column=col_num,
-                            value=each.get(key)
+                            value=value
                         )
                         col_num += 1
                     row_num += 1
