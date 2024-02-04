@@ -975,3 +975,13 @@ def get_recent_days_date(
         start_date=get_date_string(days=num_start),
         end_date=get_date_string(days=num_end)
     )
+
+
+def network_timestamp():
+    """
+    获取网络时间，精确到毫秒
+    """
+    url = 'https://api.m.taobao.com/rest/api3.do?api=mtop.common.getTimestamp'  # 淘宝网络取时
+    res = requests.get(url=url)
+    net_t = res.json()['data']['t']  # 精确到毫秒的时间戳
+    return int(net_t)

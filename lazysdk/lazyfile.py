@@ -21,7 +21,8 @@ import xlrd
 import json
 import sys
 import os
-import zipfile
+# import zipfile
+from rich.progress import Progress
 from requests import exceptions
 
 headers_default = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101 Firefox/68.0"}
@@ -183,9 +184,9 @@ def download(
         temp_size = 0  # 已经下载文件大小
     else:
         temp_size = range_start + 0  # 已经下载文件大小
-    chunk_size = 1024  # 分割文件大小，字节B
+    chunk_size = 1024 * 1024  # 分割文件大小，字节B
     total_size = int(total_length)  # 文件总大小
-    total_size_mb = round(total_size / (1024 * 1024), 2)  # 换算到MB的文件大小
+    # total_size_mb = round(total_size / (1024 * 1024), 2)  # 换算到MB的文件大小
     # 添加文件大小控制，跳过下载超大文件
     if size_limit is None:
         pass
@@ -195,7 +196,6 @@ def download(
         else:
             pass
 
-    time_start = time.time()  # 获取下载开始时间
     is_finish = False
 
     if overwrite and os.path.exists(path_local):
@@ -216,54 +216,26 @@ def download(
         pass
 
     with open(path_local, "ab") as f:  # wb新建文件，a追加
-        for chunk in response.iter_content(chunk_size=chunk_size):
-            try:
-                temp_time_now = time.time()  # 时间采样
-                time_spend_total = temp_time_now - time_start
-                if time_spend_total == 0:
-                    total_speed = round((temp_size-range_start) / (1024 * 1024) / 0.001, 2)  # 计算速度：MB/s
-                else:
-                    total_speed = round((temp_size-range_start) / (1024 * 1024) / time_spend_total, 2)  # 计算速度：MB/s
-                if not chunk:
-                    if temp_size >= total_size:
-                        is_finish = True
+        with Progress() as progress:
+            task = progress.add_task(description="[red]Downloading...", total=total_size)
+            for chunk in response.iter_content(chunk_size=chunk_size):
+                try:
+                    if not chunk:
+                        if temp_size >= total_size:
+                            is_finish = True
+                        else:
+                            is_finish = False
+                        break
                     else:
-                        is_finish = False
-                    break
-                else:
-                    temp_size += len(chunk)
-                    f.write(chunk)
-                    f.flush()
-                    done = int(50 * temp_size / total_size)
-                    if total_speed == 0 or time_spend_total == 0:
-                        time_left = 0
-                    else:
-                        time_left = (total_size - temp_size) / total_speed / 1024 / 1024
-                    show_dict = {
-                        'finish_mark': '█' * done,
-                        'not_finish_mark': ' ' * (50 - done),
-                        'total_size': total_size_mb,  # 换算到M
-                        'total_percent': round(100 * temp_size / total_size, 4),
-                        'total_speed': total_speed,
-                        'finish_size': round(temp_size / (1024 * 1024), 2),
-                        'time_spend_total': int(time_spend_total),
-                        'time_left': int(time_left)
-                    }
-                    show_msg = "\r[%(finish_mark)s%(not_finish_mark)s] " \
-                               "总大小:%(total_size)sMB " \
-                               "总进度:%(total_percent)s%% " \
-                               "平均速度:%(total_speed)sMB/s " \
-                               "已下载:%(finish_size)sMB " \
-                               "已耗时 %(time_spend_total)s 秒 " \
-                               "预计剩余 %(time_left)s 秒" % show_dict
-                    sys.stdout.write(show_msg)
-                    sys.stdout.flush()
-                    if temp_size >= total_size:
-                        is_finish = True
-                    else:
-                        is_finish = False
-            except:
-                showlog.error('')
+                        f.write(chunk)
+                        f.flush()
+                        progress.update(task, advance=chunk_size)
+                        if temp_size >= total_size:
+                            is_finish = True
+                        else:
+                            is_finish = False
+                except:
+                    showlog.error('')
     print("\n  ==> 文件已全部下载完成，保存位置:", path_local)
     res_dict = {
         'file_dir': path_local,
