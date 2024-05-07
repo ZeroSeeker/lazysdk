@@ -205,7 +205,8 @@ def send_text(
         at_mobiles: list = None,
         is_at: bool = None,
         at_all: bool = None,
-        ensure_success: bool = False
+        ensure_success: bool = False,
+        ensure_success_limit: int = 60
 ):
     """
     在内部实例化，
@@ -236,6 +237,7 @@ def send_text(
     webhook_hostname = urlparse(webhook).hostname
     if webhook_hostname == 'qyapi.weixin.qq.com':
         webhook_basic = WeixinBasics(con_info=con_info)
+        retry_count = 0
         while True:
             response = webhook_basic.send_text(
                 msg=msg,
@@ -252,6 +254,9 @@ def send_text(
                     return response
                 else:
                     showlog.warning(response)
+                    retry_count += 1
+                    if retry_count > ensure_success_limit:
+                        return response
                     time.sleep(1)
     else:
         return {'errcode': -2, 'errmsg': '暂不支持此webhook'}
