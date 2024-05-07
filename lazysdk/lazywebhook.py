@@ -6,6 +6,8 @@
 @ GitHub : https://github.com/ZeroSeeker
 @ Gitee : https://gitee.com/ZeroSeeker
 """
+import time
+
 from lazysdk import lazyrequests
 import showlog
 import json
@@ -202,7 +204,8 @@ def send_text(
         at_ids: list = None,
         at_mobiles: list = None,
         is_at: bool = None,
-        at_all: bool = None
+        at_all: bool = None,
+        ensure_success: bool = False
 ):
     """
     在内部实例化，
@@ -233,14 +236,22 @@ def send_text(
     webhook_hostname = urlparse(webhook).hostname
     if webhook_hostname == 'qyapi.weixin.qq.com':
         webhook_basic = WeixinBasics(con_info=con_info)
-        response = webhook_basic.send_text(
-            msg=msg,
-            con_info=con_info,
-            at_ids=at_ids,
-            at_mobiles=at_mobiles,
-            is_at=is_at,
-            at_all=at_all
-        )
-        return response
+        while True:
+            response = webhook_basic.send_text(
+                msg=msg,
+                con_info=con_info,
+                at_ids=at_ids,
+                at_mobiles=at_mobiles,
+                is_at=is_at,
+                at_all=at_all
+            )
+            if not ensure_success:
+                return response
+            else:
+                if response.get('errcode') == 0:
+                    return response
+                else:
+                    showlog.warning(response)
+                    time.sleep(1)
     else:
         return {'errcode': -2, 'errmsg': '暂不支持此webhook'}
