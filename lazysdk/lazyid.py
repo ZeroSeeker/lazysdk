@@ -40,3 +40,5 @@ class MakeId:
         self.utcnow_str = utcnow_str
         self.urandom_hex = urandom_hex
         self.id = f"{utcnow_str}{urandom_hex}"
+        self.random_uuid = str(uuid.uuid1(node=uuid_node))
+        self.mac_uuid = str(uuid.uuid1())
