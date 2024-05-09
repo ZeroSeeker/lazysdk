@@ -25,7 +25,8 @@ def make_tbody(body_list: list):
 def make_tb(
         data: list,
         border: int = 0,
-        beautiful: bool = False
+        beautiful: bool = False,
+        charset: str = "GBK"
 ) -> str:
     """
     输入数据为list(dict())，输出生成的html表格代码
@@ -50,7 +51,7 @@ def make_tb(
     if border:
         table_others += f' border={border}'
 
-    html_table = f"<table{table_others}>\n{html_head}\n{html_body}</table>"
+    html_table = f"""<meta http-equiv="Content-Type" content="text/html;charset={charset}"/>\n<table{table_others}>\n{html_head}\n{html_body}</table>"""
 
     if beautiful:
         # 美化输出
