@@ -26,7 +26,7 @@ def make_tb(
         data: list,
         border: int = 0,
         beautiful: bool = False,
-        charset: str = "GBK"
+        charset: str = "UTF-8"
 ) -> str:
     """
     输入数据为list(dict())，输出生成的html表格代码
