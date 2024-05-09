@@ -1,3 +1,4 @@
+from collections import OrderedDict
 
 
 def make_thead(head_list: list):
@@ -26,7 +27,8 @@ def make_tb(
         data: list,
         border: int = 0,
         beautiful: bool = False,
-        charset: str = "UTF-8"
+        charset: str = "UTF-8",
+        col_name_dict: OrderedDict = None
 ) -> str:
     """
     输入数据为list(dict())，输出生成的html表格代码
@@ -36,7 +38,17 @@ def make_tb(
     for each_data in data:
         key_list.extend(list(each_data.keys()))
     key_list = list(set(key_list))
-    thead_list = make_thead(head_list=key_list)
+    if col_name_dict:
+        key_list_new = list()
+        for each_key in key_list:
+            each_value = col_name_dict.get(each_key)
+            if each_value:
+                key_list_new.append(each_value)
+            else:
+                key_list_new.append(each_key)
+        thead_list = make_thead(head_list=key_list_new)
+    else:
+        thead_list = make_thead(head_list=key_list)
     html_head = f"<tr>{''.join(thead_list)}</tr>"
 
     html_body = ''
