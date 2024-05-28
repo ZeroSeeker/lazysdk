@@ -219,3 +219,10 @@ def path_rename(
         return new_path
     else:
         return
+
+
+def exe_path():
+    """
+    获取当前脚本的绝对路径
+    """
+    return os.path.dirname(os.path.realpath(sys.argv[0]))
