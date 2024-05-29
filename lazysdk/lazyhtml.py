@@ -79,3 +79,11 @@ def make_tb(
         html_table = html.tostring(root, pretty_print=True)
 
     return html_table
+
+
+def get_text(content: str):
+    """
+    从html中提取文本
+    """
+    import html2text
+    return html2text.html2text(content)
