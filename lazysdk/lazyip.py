@@ -6,6 +6,8 @@
 @ GitHub : https://github.com/ZeroSeeker
 @ Gitee : https://gitee.com/ZeroSeeker
 """
+import json
+
 import requests
 
 
@@ -55,5 +57,6 @@ def get_ip_addr(ip: str):
     """
     api_url = f'http://whois.pconline.com.cn/ipJson.jsp?ip={ip}&json=true'
     response = requests.get(api_url)
-    addr = response.json()['addr']
+    response_text = response.text.replace("\\", "-")
+    addr = json.loads(response_text)['addr']
     return addr
