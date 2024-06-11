@@ -145,7 +145,7 @@ def download(
         proxies=proxies,
         verify=verify
     )
-    total_length = response.headers.get('content-length')  # 文件大小
+    total_length = response.headers.get('content-length', '0')  # 文件大小
     content_type = response.headers.get('content-type')  # 文件类型
     content_disposition = response.headers.get('content-disposition')  # 文件名及类型
     filename_default = 'unknown_' + str(time.time())
