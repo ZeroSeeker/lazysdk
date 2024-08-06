@@ -287,20 +287,26 @@ def get_timestamp():
 def get_timestamp2datetime(
         timestamp: int = None,
         f: str = "%Y-%m-%d %H:%M:%S",
-        zero_to_none: bool = True
+        zero_to_none: bool = True,
+        utc: bool = False
 ):
     """
     将时间戳转换为datetime时间
     :param timestamp: 同时支持字符串和数字格式
     :param f:
     :param zero_to_none: 将0转换为空值
+    :param utc: 是否为utc时间
     :return: 2018-08-01 14:19:53
     """
     if timestamp is not None:
         if timestamp == 0 and zero_to_none is True:
             return
         else:
-            time_array = time.localtime(timestamp)
+            if utc:
+                time_array = time.gmtime(timestamp)
+            else:
+                time_array = time.localtime(timestamp)
+
             date_time = time.strftime(f, time_array)
             return date_time
     else:
@@ -310,7 +316,8 @@ def get_timestamp2datetime(
 def get_timestamp2date(
         timestamp: int = None,
         f: str = "%Y-%m-%d",
-        zero_to_none: bool = True
+        zero_to_none: bool = True,
+        utc: bool = False
 ):
     """
     将时间戳转换为datetime时间
@@ -318,13 +325,17 @@ def get_timestamp2date(
     :param timestamp:
     :param f:
     :param zero_to_none: 将0转换为空值
+    :param utc: 是否为utc时间
     :return: 2018-08-01 14:19:53
     """
     if timestamp is not None:
         if timestamp == 0 and zero_to_none is True:
             return
         else:
-            time_array = time.localtime(timestamp)
+            if utc:
+                time_array = time.gmtime(timestamp)
+            else:
+                time_array = time.localtime(timestamp)
             date_time = time.strftime(f, time_array)
             return date_time
     else:
