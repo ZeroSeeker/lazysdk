@@ -185,10 +185,13 @@ def delete(path_or_file):
     """
     删除目录/文件
     """
-    if os.path.isdir(path_or_file):
-        shutil.rmtree(path_or_file)
+    if os.path.exists(path_or_file):
+        if os.path.isdir(path_or_file):
+            shutil.rmtree(path_or_file)
+        else:
+            os.remove(path_or_file)
     else:
-        os.remove(path_or_file)
+        return
 
 
 def get_folder_name(dir_or_path: str):
