@@ -286,3 +286,31 @@ def key_min_value(
         else:
             continue
     return min_value
+
+
+def get_value_list(
+        list_in: list,
+        key,
+        deepcopy: bool = True
+):
+    """
+    提取list嵌套的字典中某个key的值列表
+    """
+    res = []
+    if list_in:
+        for each in list_in:
+            if isinstance(each, dict):
+                each_value  = each.get(key)
+                if each_value:
+                    res.append(each_value)
+                else:
+                    continue
+            else:
+                continue
+        if deepcopy:
+            return copy.deepcopy(res)
+        else:
+            return res
+    else:
+        return []
+
