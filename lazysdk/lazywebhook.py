@@ -258,5 +258,12 @@ def send_text(
                     if retry_count > ensure_success_limit:
                         return response
                     time.sleep(1)
+    elif webhook_hostname == 'open.feishu.cn':
+        lazyrequests.lazy_requests(
+            url=webhook,
+            method="POST",
+            headers={"Content-Type": "application/json"},
+            json={"msg_type":"text","content":{"text": msg}}
+        )
     else:
         return {'errcode': -2, 'errmsg': '暂不支持此webhook'}
