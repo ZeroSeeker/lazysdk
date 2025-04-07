@@ -163,13 +163,17 @@ def get_time(
 
 
 def get_datetime(
-        f: str = '%Y-%m-%d %H:%M:%S'
+        f: str = '%Y-%m-%d %H:%M:%S',
+        utc: bool = False
 ):
     """
     获取当前系统的当前时间格式的时间，精确到秒
     :return: 2018-08-01 14:18:31
     """
-    inner_now = datetime.datetime.now()
+    if utc:
+        inner_now = datetime.datetime.now(pytz.utc)
+    else:
+        inner_now = datetime.datetime.now()
     data_time = inner_now.strftime(f)
     return data_time
 
@@ -710,14 +714,20 @@ def get_data_date_string(
 
 def get_date_string(
         days: int = 0,
-        f: str = '%Y-%m-%d'
+        f: str = '%Y-%m-%d',
+        utc: bool = False
 ):
     """
     获取多少天以后的时间字符串
     :param days: 多少天以后，正数向未来计算，负数向历史计算，0是当天
+    :param f:
+    :param utc:
     :return: 时间字符串(xxxx-xx-xx)
     """
-    current_time = datetime.datetime.now()
+    if utc:
+        current_time = datetime.datetime.now(tz=pytz.utc)
+    else:
+        current_time = datetime.datetime.now()
     target_time = current_time + datetime.timedelta(days=days)
     date_str = target_time.strftime(f)
     return date_str
