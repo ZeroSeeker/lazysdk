@@ -245,7 +245,7 @@ def list_dict_filter(
     从[{},{}]中按照某个key-value条件筛选出符合条件的记录
     """
     list_out = list(filter(lambda x: x[filter_key] == filter_value, list_in))
-    return list_out
+    return copy.deepcopy(list_out)
 
 
 def key_max_value(
