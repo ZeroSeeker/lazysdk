@@ -265,5 +265,11 @@ def send_text(
             headers={"Content-Type": "application/json"},
             json={"msg_type":"text","content":{"text": msg}}
         )
+    elif webhook_hostname == 'api.day.app':
+        # 支持简单的Bark推送
+        lazyrequests.lazy_requests(
+            url=webhook,
+            method="GET"
+        )
     else:
         return {'errcode': -2, 'errmsg': '暂不支持此webhook'}
