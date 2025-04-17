@@ -670,6 +670,20 @@ def date_str_list(
     return date_list
 
 
+def get_date_list(
+        start_date: str = None,
+        end_date: str = None,
+        start_days: int = None,
+        end_days: int = None
+):
+    return date_str_list(
+        start_date=start_date,
+        end_date=end_date,
+        start_days=start_days,
+        end_days=end_days
+    )
+
+
 def date_str_list_form_now(
         day_num: int = 1
 ):
