@@ -4,7 +4,7 @@ import re
 def find_between(
         text: str,
         left: str,
-        right: str,
+        right: str = None,
         until_line_end: bool = False  # 是否匹配到行尾
 ):
     """
@@ -19,7 +19,7 @@ def find_between(
 def find_all(
         text: str,
         left: str,
-        right: str,
+        right: str = None,
         until_line_end: bool = False  # 是否匹配到行尾
 ):
     """
