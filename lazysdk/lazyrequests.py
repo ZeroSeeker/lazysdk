@@ -23,7 +23,8 @@ def lazy_requests(
         ReadTimeout_retry: bool = True,  # 超时重试
         JSONDecodeError_retry: bool = True,  # 返回非json类型重试
         ConnectionError_retry: bool = True,  # 连接错误重试
-        ChunkedEncodingError: bool = True,
+        ChunkedEncodingError_retry: bool = True,
+        TooManyRedirects_retry: bool = True,
 
         **kwargs
 ):
@@ -53,22 +54,27 @@ def lazy_requests(
         except requests.exceptions.ReadTimeout:
             if ReadTimeout_retry is True:
                 retry_count += 1
-                showlog.warning(f'ReadTimeout_retry，将在{retry_delay}秒后重试第{retry_count}次...')
+                showlog.warning(f'ReadTimeout，将在{retry_delay}秒后重试第{retry_count}次...')
                 time.sleep(retry_delay)
         except requests.exceptions.JSONDecodeError:
             if JSONDecodeError_retry is True:
                 retry_count += 1
-                showlog.warning(f'JSONDecodeError_retry，将在{retry_delay}秒后重试第{retry_count}次...')
+                showlog.warning(f'JSONDecodeError，将在{retry_delay}秒后重试第{retry_count}次...')
                 time.sleep(retry_delay)
         except requests.exceptions.ConnectionError:  # 包含ProxyError
             if ConnectionError_retry is True:
                 retry_count += 1
-                showlog.warning(f'ConnectionError_retry，将在{retry_delay}秒后重试第{retry_count}次...')
+                showlog.warning(f'ConnectionError，将在{retry_delay}秒后重试第{retry_count}次...')
                 time.sleep(retry_delay)
         except requests.exceptions.ChunkedEncodingError:
-            if ChunkedEncodingError is True:
+            if ChunkedEncodingError_retry is True:
                 retry_count += 1
-                showlog.warning(f'ChunkedEncodingError_retry，将在{retry_delay}秒后重试第{retry_count}次...')
+                showlog.warning(f'ChunkedEncodingError，将在{retry_delay}秒后重试第{retry_count}次...')
+                time.sleep(retry_delay)
+        except requests.exceptions.TooManyRedirects:
+            if TooManyRedirects_retry is True:
+                retry_count += 1
+                showlog.warning(f'TooManyRedirects，将在{retry_delay}秒后重试第{retry_count}次...')
                 time.sleep(retry_delay)
         if retry_limit == 0:
             break
