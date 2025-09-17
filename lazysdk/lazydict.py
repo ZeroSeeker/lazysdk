@@ -291,18 +291,25 @@ def key_min_value(
 def get_value_list(
         list_in: list,
         key,
-        deepcopy: bool = True
+        deepcopy: bool = True,
+        value_type: type = None
 ):
     """
     提取list嵌套的字典中某个key的值列表
+    :param value_type: 将值格式化为指定的类型，例如str
     """
     res = []
     if list_in:
         for each in list_in:
             if isinstance(each, dict):
                 each_value  = each.get(key)
-                if each_value:
+                if each_value and value_type is None:
                     res.append(each_value)
+                elif each_value and value_type is not None:
+                    if isinstance(each_value, value_type):
+                        res.append(each_value)
+                    else:
+                        res.append(value_type(each_value))
                 else:
                     continue
             else:
@@ -314,3 +321,16 @@ def get_value_list(
     else:
         return []
 
+
+if __name__ == '__main__':
+    res = get_value_list(
+        list_in = [
+            {"a": "1"},
+            {"a": "2"},
+            {"a": None},
+        ],
+        key = "a",
+        value_type = int
+
+    )
+    print(res)
