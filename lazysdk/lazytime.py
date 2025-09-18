@@ -925,7 +925,8 @@ def get_file_name(
 
 
 def format_seconds(
-        input_seconds
+        input_seconds,
+        output_type: type = str
 ):
     """
     输入秒数，以时间形式输出
@@ -937,7 +938,10 @@ def format_seconds(
         seconds=seconds,  # 秒
         microseconds=microseconds  # 微秒
     )
-    return format_time
+    if output_type:
+        return output_type(format_time)
+    else:
+        return format_time
 
 
 def get_gap_days(
