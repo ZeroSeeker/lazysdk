@@ -259,7 +259,7 @@ def send_text(
                         return response
                     time.sleep(1)
     elif webhook_hostname == 'open.feishu.cn':
-        lazyrequests.lazy_requests(
+        return lazyrequests.lazy_requests(
             url=webhook,
             method="POST",
             headers={"Content-Type": "application/json"},
@@ -267,9 +267,54 @@ def send_text(
         )
     elif webhook_hostname == 'api.day.app':
         # 支持简单的Bark推送
-        lazyrequests.lazy_requests(
+        return lazyrequests.lazy_requests(
             url=webhook,
             method="GET"
         )
     else:
         return {'errcode': -2, 'errmsg': '暂不支持此webhook'}
+
+
+def send(
+        msg: str = None,
+
+        env_file_name: str = None,
+        webhook: str = None,
+        webhooks: list = None,
+        at_ids: list = None,
+        at_mobiles: list = None,
+        is_at: bool = None,
+        at_all: bool = None,
+        ensure_success: bool = False,
+        ensure_success_limit: int = 60
+):
+    webhooks_all = list()
+    send_res = list()
+    if webhook:
+        webhooks_all.append(webhook)
+    if webhooks:
+        webhooks_all.extend(webhooks)
+
+    if not webhooks_all:
+        showlog.warning("无有效的webhook地址")
+    else:
+        for each_index, each_webhook in enumerate(webhooks_all):
+            showlog.info(f"正在发送第 {each_index+1}/{len(webhooks_all)} 条推送: \n{msg}\n")
+            each_send_res = send_text(
+                msg=msg,
+                env_file_name=env_file_name,
+                webhook=each_webhook,
+                at_ids=at_ids,
+                at_mobiles=at_mobiles,
+                is_at=is_at,
+                at_all=at_all,
+                ensure_success=ensure_success,
+                ensure_success_limit=ensure_success_limit
+            )
+            send_res.append({
+                "webhook": each_webhook,
+                "msg": msg,
+                "send_res": each_send_res,
+            })
+
+    return send_res
