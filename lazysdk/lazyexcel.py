@@ -234,7 +234,9 @@ def save_xlsx(
         num_cols: list = None,
         col_name_dict: dict = None,
         col_name_sort: list = None,
-        cell_number_format: dict = None
+        cell_number_format: dict = None,
+        rank_col: str = None,
+        rank_asc: bool = True,
 ):
     """
     如果输入的value是乱序，将重新排序
@@ -246,6 +248,8 @@ def save_xlsx(
     :param col_name_dict: 自定义列名的对照关系，规则为：{'旧名称1':'新名称1', '旧名称2':'新名称2'}
     :param col_name_sort: 自定义列名排序，将按照列表顺序排，如果不在列表中，将随机
     :param cell_number_format: 自定义列数据格式，例如{"a": "0.00", "b": "0.00%"}
+    :param rank_col: 排序列名
+    :param rank_asc: 排序列是否正序排序，True为按正序排序，False为按倒序排序
     将输出保存后的文件绝对路径
     """
     if os.path.isabs(file):  # 判断是否为绝对路径
@@ -281,6 +285,19 @@ def save_xlsx(
                     list_data=sheet_data,
                     keys_sort=col_name_sort
                 )  # 先对要存储的数据做排序对齐
+
+                # 对值排序
+                if rank_col:
+                    if rank_asc:
+                        sheet_data_f = lazydict.dict_list_ranker(
+                            dict_list=sheet_data_f,
+                            rank_by_list=[[rank_col, 'asc']]
+                        )  # 升序排序
+                    else:
+                        sheet_data_f = lazydict.dict_list_ranker(
+                            dict_list=sheet_data_f,
+                            rank_by_list=[[rank_col,'desc']]
+                        )  # 降序排序
 
                 if date_cols is not None:
                     for each_sheet_data_f in sheet_data_f:
