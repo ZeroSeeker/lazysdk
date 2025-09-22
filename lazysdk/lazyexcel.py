@@ -363,9 +363,13 @@ def save_xlsx(
                             column=col_num,
                             value=value
                         )
-                        value_cell_number_format = cell_number_format.get(key)
-                        if value_cell_number_format:
-                            cell.number_format = value_cell_number_format  # 设置单元格数据格式
+
+                        # 对单元数据格式化
+                        if cell_number_format:
+                            value_cell_number_format = cell_number_format.get(key)
+                            if value_cell_number_format:
+                                cell.number_format = value_cell_number_format  # 设置单元格数据格式
+
                         col_num += 1
                     row_num += 1
             else:
