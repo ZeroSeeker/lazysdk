@@ -233,7 +233,8 @@ def save_xlsx(
         datetime_cols: list = None,
         num_cols: list = None,
         col_name_dict: dict = None,
-        col_name_sort: list = None
+        col_name_sort: list = None,
+        cell_number_format: dict = None
 ):
     """
     如果输入的value是乱序，将重新排序
@@ -244,6 +245,7 @@ def save_xlsx(
     :param num_cols: 数字列列表
     :param col_name_dict: 自定义列名的对照关系，规则为：{'旧名称1':'新名称1', '旧名称2':'新名称2'}
     :param col_name_sort: 自定义列名排序，将按照列表顺序排，如果不在列表中，将随机
+    :param cell_number_format: 自定义列数据格式，例如{"a": "0.00", "b": "0.00%"}
     将输出保存后的文件绝对路径
     """
     if os.path.isabs(file):  # 判断是否为绝对路径
@@ -339,11 +341,14 @@ def save_xlsx(
                         value = each.get(key)
                         if isinstance(value, dict) or isinstance(value, list):
                             value = json.dumps(value, ensure_ascii=False)
-                        sheet.cell(
+                        cell = sheet.cell(
                             row=row_num,
                             column=col_num,
                             value=value
                         )
+                        value_cell_number_format = cell_number_format.get(key)
+                        if value_cell_number_format:
+                            cell.number_format = value_cell_number_format  # 设置单元格数据格式
                         col_num += 1
                     row_num += 1
             else:
