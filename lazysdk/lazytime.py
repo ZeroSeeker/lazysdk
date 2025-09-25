@@ -1024,3 +1024,83 @@ def network_timestamp():
     res = requests.get(url=url)
     net_t = res.json()['data']['t']  # 精确到毫秒的时间戳
     return int(net_t)
+
+
+def str2datetime(
+        input_str,
+        input_str_format: str = 'YYmmdd',
+        output_str_format: str = '%Y-%m-%d %H:%M:%S.%f',
+):
+    """
+    将输入的字符串按照既定格式格式化后输出
+    :param input_str: 输入的字符串
+    :param input_str_format: 输入的字符串格式，例如：YYmmdd
+    :param output_str_format: 输出的字符串格式，例如：%Y-%m-%d %H:%M:%S.%f
+    """
+    year_str = ""
+    month_str = ""
+    day_str = ""
+    hour_str = ""
+    minute_str = ""
+    second_str = ""
+
+    for index in range(len(input_str_format)):
+        index_str = input_str_format[index]
+        if index_str == 'Y':
+            year_str += input_str[index]
+        elif index_str == 'm':
+            month_str += input_str[index]
+        elif index_str == 'd':
+            day_str += input_str[index]
+        elif index_str == 'H':
+            hour_str += input_str[index]
+        elif index_str == 'M':
+            minute_str += input_str[index]
+        elif index_str == 'S':
+            second_str += input_str[index]
+        else:
+            continue
+
+    if year_str:
+        year_int = int(year_str)
+    else:
+        year_int = None
+
+    if month_str:
+        month_int = int(month_str)
+    else:
+        month_int = None
+
+    if day_str:
+        day_int = int(day_str)
+    else:
+        day_int = None
+
+    if hour_str:
+        hour_int = int(hour_str)
+    else:
+        hour_int = 0
+
+    if minute_str:
+        minute_int = int(minute_str)
+    else:
+        minute_int = 0
+
+    if second_str:
+        second_int = int(second_str)
+    else:
+        second_int = 0
+
+    return datetime.datetime(
+        year=year_int,
+        month=month_int,
+        day=day_int,
+        hour=hour_int,
+        minute=minute_int,
+        second=second_int
+    ).strftime(output_str_format)
+
+
+if __name__ == '__main__':
+    res = str2datetime(input_str="20250101123456", input_str_format="YYYYmmdd")
+    print(res)
