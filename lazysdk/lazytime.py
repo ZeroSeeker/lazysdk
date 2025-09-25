@@ -1028,7 +1028,7 @@ def network_timestamp():
 
 def str2datetime(
         input_str,
-        input_str_format: str = 'YYmmdd',
+        input_str_format: str = 'YYYYmmdd',
         output_str_format: str = '%Y-%m-%d %H:%M:%S.%f',
 ):
     """
