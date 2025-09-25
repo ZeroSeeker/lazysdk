@@ -252,12 +252,18 @@ def save_xlsx(
     :param rank_asc: 排序列是否正序排序，True为按正序排序，False为按倒序排序
     将输出保存后的文件绝对路径
     """
+    # 自动检查添加后缀
+    if file.endswith(".xlsx"):
+        pass
+    else:
+        file += ".xlsx"
+
     if os.path.isabs(file):  # 判断是否为绝对路径
         pass
     else:
         file = os.getcwd() + path_separator + file
     if value is None:
-        return
+        return file
     else:
         wb = openpyxl.Workbook()
         sheet_index = 0  # sheet序号
