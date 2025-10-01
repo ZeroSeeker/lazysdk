@@ -21,6 +21,12 @@ class LazyEncoder(json.JSONEncoder):
             except UnicodeDecodeError:
                 # 如果UTF-8解码失败，回退到Base64编码
                 return base64.b64encode(obj).decode('utf-8')
+        # elif isinstance(obj, bson.timestamp.Timestamp):
+        #     # # 将BSON时间戳转换为其时间表示的ISO格式字符串
+        #     return obj.as_datetime().isoformat()
+        # elif isinstance(obj, bson.objectid.ObjectId):
+        #     # # 将ObjectId转换为字符串
+        #     return str(obj)
         return super(LazyEncoder, self).default(obj)
 
 
