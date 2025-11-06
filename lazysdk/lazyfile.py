@@ -94,7 +94,7 @@ def download(
         filename: str = None,
         suffix_name: str = None,
         headers: dict = None,
-        path: str = "download",
+        path: str = None,
         proxies=None,
         size_limit: int = None,
         range_start: int = None,
@@ -183,6 +183,8 @@ def download(
         else:
             os.makedirs(path)
         path_local = os.path.join(path, download_file_name)
+
+    lazypath.make_path(lazypath.file_path(path_local))
 
     if not range_start:
         temp_size = 0  # 已经下载文件大小
