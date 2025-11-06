@@ -169,7 +169,11 @@ def download(
     if filename is None:
         download_file_name = str(filename_default) + "." + str(suffix_name)
     else:
-        download_file_name = str(filename) + "." + str(suffix_name)
+        if filename.endswith(suffix_name):
+            # 如果文件名中已存在后缀名，则不重复添加
+            download_file_name = filename
+        else:
+            download_file_name = str(filename) + "." + str(suffix_name)
 
     if path is None:
         path_local = download_file_name
