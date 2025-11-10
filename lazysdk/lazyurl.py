@@ -12,8 +12,11 @@ def get_url_params(
         params_str_split = params_str.split('&')
         params_dict = dict()
         for each in params_str_split:
-            each_split = each.split('=', maxsplit=1)
-            params_dict[each_split[0]] = each_split[1]
+            if '=' in each:
+                each_split = each.split('=', maxsplit=1)
+                params_dict[each_split[0]] = each_split[1]
+            else:
+                continue
         return params_dict
     else:
         return
