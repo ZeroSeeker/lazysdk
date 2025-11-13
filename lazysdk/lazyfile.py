@@ -232,8 +232,8 @@ def download(
                     if not chunk:
                         if temp_size >= total_size:
                             is_finish = True
-                        else:
-                            is_finish = False
+                        # else:
+                        #     is_finish = False
                         break
                     else:
                         f.write(chunk)
@@ -242,7 +242,8 @@ def download(
                         if temp_size >= total_size:
                             is_finish = True
                         else:
-                            is_finish = False
+                            # is_finish = False
+                            temp_size += chunk_size
                 except:
                     showlog.error('')
     print("\n  ==> 文件已全部下载完成，保存位置:", path_local)
