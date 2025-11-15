@@ -67,4 +67,11 @@ def domain_split(url):
     domain_dict = dict()
     for _ in range(len(netloc_split)):
         domain_dict[f'domain_{_+1}'] = '.'.join(netloc_split[-_ - 1:])
+    domain_dict["host_record"] = '.'.join(netloc_split[:len(netloc_split) -2])
+    domain_dict["domain_name"] = '.'.join(netloc_split[len(netloc_split) - 2:])
     return domain_dict
+
+
+if __name__ == '__main__':
+    # domainName，host record
+    print(domain_split("1.2.test.a.com"))
