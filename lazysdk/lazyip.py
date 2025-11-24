@@ -414,4 +414,3 @@ class IPAddr:
 
 if __name__ == '__main__':
     test = IPw()
-    print(test.get_public_ip_address())

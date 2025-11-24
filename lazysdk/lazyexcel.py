@@ -17,6 +17,7 @@ import os
 from .lazypath import path_separator
 from .lazytime import get_format_date
 from .lazytime import get_format_datetime
+from .lazypath import delete
 
 
 # -------------------------------读取功能区域-------------------------------
@@ -237,6 +238,7 @@ def save_xlsx(
         cell_number_format: dict = None,
         rank_col: str = None,
         rank_asc: bool = True,
+        overwrite: bool = True
 ):
     """
     如果输入的value是乱序，将重新排序
@@ -265,6 +267,9 @@ def save_xlsx(
     if value is None:
         return file
     else:
+        if overwrite:
+            delete(file)
+
         wb = openpyxl.Workbook()
         sheet_index = 0  # sheet序号
 
@@ -390,8 +395,14 @@ def save(
         file: str,
         value: dict = None,
         date_cols: dict = None,  # 字符串转换为date
-        overwrite: bool = False,
-        col_name_dict: dict = None
+        datetime_cols: list = None,
+        num_cols: list = None,
+        col_name_dict: dict = None,
+        col_name_sort: list = None,
+        cell_number_format: dict = None,
+        rank_col: str = None,
+        rank_asc: bool = True,
+        overwrite: bool = True
 ):
     """
     如果输入的value是乱序，将重新排序
@@ -415,7 +426,13 @@ def save(
             file=file,
             value=value,
             date_cols=date_cols,
-            col_name_dict=col_name_dict
+            datetime_cols=datetime_cols,
+            num_cols=num_cols,
+            col_name_dict=col_name_dict,
+            col_name_sort=col_name_sort,
+            cell_number_format=cell_number_format,
+            rank_col=rank_col,
+            rank_asc=rank_asc
         )
         return
     elif suffix == 'xls':
