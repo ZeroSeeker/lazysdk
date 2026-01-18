@@ -412,9 +412,9 @@ def save(
     :param overwrite: 是否覆盖
     :param col_name_dict: 自定义列名的对照关系，规则为：{'旧名称1':'新名称1', '旧名称2':'新名称2'}
     """
-    if overwrite is False:
-        if os.path.exists(file) is True:
-            return
+    if not overwrite:
+        if os.path.exists(file):
+            return None
         else:
             pass
     else:
@@ -422,7 +422,7 @@ def save(
 
     suffix = file.split('.')[-1]  # 获取文件后缀名
     if suffix == 'xlsx':
-        save_xlsx(
+        return save_xlsx(
             file=file,
             value=value,
             date_cols=date_cols,
@@ -434,10 +434,9 @@ def save(
             rank_col=rank_col,
             rank_asc=rank_asc
         )
-        return
     elif suffix == 'xls':
         print(':( xls is not supported')
-        return
+        return None
     else:
         print(':( file is not supported')
-        return
+        return None
