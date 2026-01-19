@@ -658,13 +658,15 @@ def unzip(
         new_name = name_dict.get(each_name)
         if new_name:
             new_name_dir = os.path.join(unzip_path, new_name)
+            # print("unzip_path:", unzip_path)
+            # print("file_path:", file_path)
             extract_name = my_zip.extract(
                 member=each_name,
-                path=unzip_path
+                # path=file_path
             )
             if extract_name == new_name_dir:
                 # print(extract_name)
-                pass
+                unzip_names.append(new_name_dir)
             else:
                 # print(extract_name, '-->', new_name_dir)
                 os.renames(old=extract_name, new=new_name_dir)  # 对乱码文件名重命名
