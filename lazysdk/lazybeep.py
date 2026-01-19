@@ -2,6 +2,9 @@ import os
 import platform
 
 def system_beep(text="system_beep"):
+    """
+    使系统发声
+    """
     system = platform.system()
     if system == "Windows":
         import winsound
