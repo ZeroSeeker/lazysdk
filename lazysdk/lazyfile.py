@@ -145,6 +145,7 @@ def download(
         proxies=proxies,
         verify=verify
     )
+    # print("response:", response.headers)
     total_length = response.headers.get('content-length', '0')  # 文件大小
     content_type = response.headers.get('content-type')  # 文件类型
     content_disposition = response.headers.get('content-disposition')  # 文件名及类型
@@ -152,16 +153,16 @@ def download(
     if content_disposition is not None:
         content_dispositions = content_disposition.replace(' ', '').split(';')
         for each_content_disposition in content_dispositions:
-            if 'filename' in each_content_disposition:
+            if 'filename=' in each_content_disposition:
                 each_content_disposition_split = each_content_disposition.split(sep='=', maxsplit=1)  # 只拆分一次，防止有多个=影响
-                filename_default_full = each_content_disposition_split[1]
+                filename_default_full = each_content_disposition_split[1].replace('"', '')
                 filename_default = filename_default_full[:filename_default_full.rfind('.')]  # 解析文件名
                 suffix_name = filename_default_full[filename_default_full.rfind('.')+1:]  # 解析文件后缀
             else:
                 pass
     else:
         pass
-
+    # print("filename_default:", filename_default)
     if suffix_name is None:
         # 尝试自动获取文件后缀名
         suffix_name = content_type.split('/')[1]
