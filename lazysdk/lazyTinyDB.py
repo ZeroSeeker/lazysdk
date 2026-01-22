@@ -29,14 +29,14 @@ def get(
         return db.all()  # 输出所有
     else:
         if search_key is not None and search_value is not None:
-            return db.search(eval(f"tb.{search_key} == {search_value}"))
+            return db.search(eval(f"tb.{search_key}") == search_value)
         else:
             return db.all()
 
 
 def get_all(db_name: str):
     db = TinyDB(db_name)
-    return db.get()
+    return db.all()
 
 
 def upsert(
