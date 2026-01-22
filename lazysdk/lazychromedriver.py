@@ -1,11 +1,14 @@
-import platform
-import sys
-import re
+# from build.lib.lazysdk import lazychromedriver
+from lazysdk import lazyfile
+from lazysdk import lazyrequests
 import subprocess
-import os
+import platform
 import zipfile
 import tarfile
-from lazysdk import lazyfile
+import sys
+import re
+import os
+
 
 # from webdriver_manager.core.utils import linux_browser_apps_to_cmd, windows_browser_apps_to_cmd, \
 #     read_version_from_cmd
@@ -150,7 +153,8 @@ class OperationSystemManager(object):
     def is_mac_os(os_sys_type):
         return OSType.MAC in os_sys_type
 
-    def get_browser_version_from_os(self, browser_type=None):
+    @staticmethod
+    def get_browser_version_from_os(browser_type=None):
         """Return installed browser version."""
         cmd_mapping = {
             ChromeType.GOOGLE: {
@@ -249,12 +253,53 @@ class OperationSystemManager(object):
             # raise Exception("Can not get browser version from OS")
 
 
-def get_driver_download_url(
-        driver_url='https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing',
+def get_browser_version(browser_type: str = "google-chrome"):
+    """
+    获取浏览器的版本，例如：144.0.7559.60
+    """
+    return OperationSystemManager().get_browser_version_from_os(browser_type=browser_type)
+
+
+def find_driver_url(
+        browser_version: str = None
 ):
+    """
+    查找匹配同一个大版本下的最新子版本的chromedriver
+    """
+    if not browser_version:
+        browser_version = get_browser_version()
     os_type = get_os_type()
-    driver_version = OperationSystemManager().get_browser_version_from_os(browser_type='google-chrome')
-    return f"{driver_url}/{driver_version}/{os_type}/chromedriver-{os_type}.zip"
+    url = "https://repo.huaweicloud.com/chromedriver/"
+    response = lazyrequests.lazy_requests(
+        method="GET",
+        url=f"{url}.index.json",
+    )
+    drivers = response["chromedriver"]
+    driver_versions = list(drivers.keys())
+    browser_version_p = ".".join(browser_version.split(".")[:-1])
+    match_versions = list()
+    for each_version in driver_versions:
+        each_version_p = ".".join(each_version.split(".")[:-1])
+        if browser_version_p == each_version_p:
+            match_versions.append(each_version)
+    match_version_max = max(match_versions)
+    match_version_max_files = drivers[match_version_max]["files"]
+    for each_file in match_version_max_files:
+        if each_file.split(".")[-2].endswith(os_type):
+            match_chromedriver_url = f"{url}{each_file}"
+            return match_chromedriver_url
+        else:
+            continue
+    return None
+
+
+# def get_driver_download_url(
+#         driver_url='https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing',
+# ):
+#     os_type = get_os_type()
+#     driver_version = OperationSystemManager().get_browser_version_from_os(browser_type='google-chrome')
+#     print("driver_version:", driver_version)
+#     return f"{driver_url}/{driver_version}/{os_type}/chromedriver-{os_type}.zip"
 
 
 # def save_archive_file(file: File, directory: str):
@@ -273,19 +318,28 @@ def download_driver():
     根据当前系统的chrome版本下载对应版本的driver
     """
     from lazysdk import lazyfile
-    driver_download_url = get_driver_download_url()
-    os.makedirs(drivers_directory, exist_ok=True)  # 创建driver下载目录
+    browser_version = get_browser_version()
+    driver_download_url = find_driver_url(browser_version=browser_version)
+    print("driver_download_url:", driver_download_url)
+    drivers_directory_version = os.path.join(drivers_directory, browser_version)
+    os.makedirs(drivers_directory_version, exist_ok=True)  # 创建driver下载目录
     filename = extract_filename_from_url(driver_download_url)
     print('filename:', filename)
-    archive_path = os.path.join(drivers_directory, filename)
+    archive_path = os.path.join(drivers_directory_version, filename)
     # archive_path = f"{directory}{os.sep}{file.filename}"
-    print(driver_download_url)
+    print("archive_path:", archive_path)
     file = lazyfile.download(
         url=driver_download_url,
-        filename=filename,
-        path=drivers_directory
+        path=drivers_directory_version
     )['file_dir']
-    return unpack_archive(archive_file=file, target_dir=drivers_directory)
+    print("file:", file)
+    unpack_archive_files = unpack_archive(
+        archive_file=file,
+    )
+    for each_file in unpack_archive_files:
+        if each_file.endswith("/chromedriver"):
+            return each_file
+    return None
 
 
 class LinuxZipFileWithPermissions(zipfile.ZipFile):
@@ -304,7 +358,10 @@ class LinuxZipFileWithPermissions(zipfile.ZipFile):
         return ret_val
 
 
-def unpack_archive(archive_file, target_dir):
+def unpack_archive(
+        archive_file,
+        target_dir: str = None
+):
     if archive_file.endswith(".zip"):
         return lazyfile.unzip(file=archive_file)
     elif archive_file.endswith(".tar.gz"):
