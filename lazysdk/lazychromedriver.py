@@ -320,9 +320,11 @@ def download_driver(overwrite: bool = False):
     """
     from lazysdk import lazyfile
     browser_version = get_browser_version()  # 获取浏览器版本
-    driver_dir = os.path.join(lazypath.home(), "chromedriver")
+
 
     drivers_directory_version = os.path.join(drivers_directory, browser_version)
+    print("drivers_directory_version:", drivers_directory_version)
+    driver_dir = os.path.join(drivers_directory_version, "chromedriver")
     if os.path.exists(drivers_directory_version):
         # 路径已经存在
         return driver_dir
