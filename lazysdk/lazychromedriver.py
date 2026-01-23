@@ -350,6 +350,7 @@ def download_driver(overwrite: bool = False):
         for each_file in unpack_archive_files:
             if each_file.endswith("/chromedriver"):
                 shutil.copy2(each_file, driver_dir)
+                os.chmod(path=driver_dir, mode=755)
                 return driver_dir
         return None
 
