@@ -348,7 +348,7 @@ def download_driver(overwrite: bool = False):
             archive_file=file,
         )
         for each_file in unpack_archive_files:
-            if each_file.endswith("/chromedriver"):
+            if lazyfile.get_file_info(each_file)["name"] == "chromedriver":
                 shutil.copy2(each_file, driver_dir)
                 os.chmod(path=driver_dir, mode=755)
                 return driver_dir
