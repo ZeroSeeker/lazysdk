@@ -8,7 +8,8 @@ import tarfile
 import sys
 import re
 import os
-
+import shutil
+from lazysdk import lazypath
 
 # from webdriver_manager.core.utils import linux_browser_apps_to_cmd, windows_browser_apps_to_cmd, \
 #     read_version_from_cmd
@@ -313,33 +314,42 @@ def find_driver_url(
 #     return Archive(archive_path)
 #
 #
-def download_driver():
+def download_driver(overwrite: bool = False):
     """
     根据当前系统的chrome版本下载对应版本的driver
     """
     from lazysdk import lazyfile
-    browser_version = get_browser_version()
-    driver_download_url = find_driver_url(browser_version=browser_version)
-    print("driver_download_url:", driver_download_url)
+    browser_version = get_browser_version()  # 获取浏览器版本
+    driver_dir = os.path.join(lazypath.home(), "chromedriver")
+
     drivers_directory_version = os.path.join(drivers_directory, browser_version)
-    os.makedirs(drivers_directory_version, exist_ok=True)  # 创建driver下载目录
-    filename = extract_filename_from_url(driver_download_url)
-    print('filename:', filename)
-    archive_path = os.path.join(drivers_directory_version, filename)
-    # archive_path = f"{directory}{os.sep}{file.filename}"
-    print("archive_path:", archive_path)
-    file = lazyfile.download(
-        url=driver_download_url,
-        path=drivers_directory_version
-    )['file_dir']
-    print("file:", file)
-    unpack_archive_files = unpack_archive(
-        archive_file=file,
-    )
-    for each_file in unpack_archive_files:
-        if each_file.endswith("/chromedriver"):
-            return each_file
-    return None
+    if os.path.exists(drivers_directory_version):
+        # 路径已经存在
+        return driver_dir
+    else:
+        # 路径不存在，需要下载
+        os.makedirs(drivers_directory_version, exist_ok=True)  # 创建driver下载目录
+
+        driver_download_url = find_driver_url(browser_version=browser_version)
+        # print("driver_download_url:", driver_download_url)
+        filename = extract_filename_from_url(driver_download_url)
+        # print('filename:', filename)
+        archive_path = os.path.join(drivers_directory_version, filename)
+        # archive_path = f"{directory}{os.sep}{file.filename}"
+        # print("archive_path:", archive_path)
+        file = lazyfile.download(
+            url=driver_download_url,
+            path=drivers_directory_version
+        )['file_dir']
+        # print("file:", file)
+        unpack_archive_files = unpack_archive(
+            archive_file=file,
+        )
+        for each_file in unpack_archive_files:
+            if each_file.endswith("/chromedriver"):
+                shutil.copy2(each_file, driver_dir)
+                return driver_dir
+        return None
 
 
 class LinuxZipFileWithPermissions(zipfile.ZipFile):
