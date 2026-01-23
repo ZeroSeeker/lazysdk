@@ -21,7 +21,8 @@ ROOT_FOLDER_NAME = ".lazy_chromedriver"
 DEFAULT_PROJECT_ROOT_CACHE_PATH = os.path.join(sys.path[0], ROOT_FOLDER_NAME)
 DEFAULT_USER_HOME_CACHE_PATH = os.path.join(os.path.expanduser("~"), ROOT_FOLDER_NAME)
 drivers_root = "drivers"
-drivers_directory = os.path.join(DEFAULT_USER_HOME_CACHE_PATH, drivers_root)
+# drivers_directory = os.path.join(DEFAULT_USER_HOME_CACHE_PATH, drivers_root)
+drivers_directory = os.path.join(drivers_root)
 
 
 def determine_powershell():
@@ -320,7 +321,6 @@ def download_driver(overwrite: bool = False):
     """
     from lazysdk import lazyfile
     browser_version = get_browser_version()  # 获取浏览器版本
-
 
     drivers_directory_version = os.path.join(drivers_directory, browser_version)
     print("drivers_directory_version:", drivers_directory_version)
