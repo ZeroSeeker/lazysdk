@@ -229,3 +229,9 @@ def exe_path():
     获取当前脚本的绝对路径
     """
     return os.path.dirname(os.path.realpath(sys.argv[0]))
+
+
+def home():
+    from pathlib import Path
+    # 获取用户主目录
+    return Path.home()  # 输出示例: C:\Users\Username 或 /home/username
