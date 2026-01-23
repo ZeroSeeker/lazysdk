@@ -324,7 +324,10 @@ def download_driver(overwrite: bool = False):
 
     drivers_directory_version = os.path.join(drivers_directory, browser_version)
     print("drivers_directory_version:", drivers_directory_version)
-    driver_dir = os.path.join(drivers_directory_version, "chromedriver")
+    if platform.system() == "Windows":
+        driver_dir = os.path.join(drivers_directory_version, "chromedriver.exe")
+    else:
+        driver_dir = os.path.join(drivers_directory_version, "chromedriver")
     if os.path.exists(drivers_directory_version):
         # 路径已经存在
         return driver_dir
