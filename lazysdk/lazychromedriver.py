@@ -22,7 +22,9 @@ DEFAULT_PROJECT_ROOT_CACHE_PATH = os.path.join(sys.path[0], ROOT_FOLDER_NAME)
 DEFAULT_USER_HOME_CACHE_PATH = os.path.join(os.path.expanduser("~"), ROOT_FOLDER_NAME)
 drivers_root = "drivers"
 # drivers_directory = os.path.join(DEFAULT_USER_HOME_CACHE_PATH, drivers_root)
-drivers_directory = os.path.join(drivers_root)
+# drivers_directory = os.path.join(drivers_root)
+drivers_directory = DEFAULT_USER_HOME_CACHE_PATH
+
 
 
 def determine_powershell():
