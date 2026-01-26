@@ -48,22 +48,22 @@ def upsert(
     tb = Query()
     for each_data in data:
         key_value = each_data.get(key)
-        db.upsert(each_data, eval(f"tb.{key}") == key_value)
+        db.upsert(each_data, tb[key] == key_value)
 
 
 if __name__ == '__main__':
     # print(insert_multiple([{"a": 2}, {"a": 2}]))
     # print(get({"name": "John"}))
 
-    # print(upsert(
-    #     data=[
-    #         {"a": 2, "b": 333},
-    #         {"a": 3, "b": 4, "c": 5, "d": 6, "e": 7},
-    #     ],
-    #     key="a"
-    # ))
-
-    print(get(
-        search_key="a",
-        search_value=2,
+    print(upsert(
+        data=[
+            {"a": 2, "b": 444},
+            # {"a": 3, "b": 4, "c": 5, "d": 6, "e": 7},
+        ],
+        key="a"
     ))
+
+    # print(get(
+    #     search_key="a",
+    #     search_value=2,
+    # ))
