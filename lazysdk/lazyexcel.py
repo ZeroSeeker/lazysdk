@@ -103,14 +103,17 @@ def read_xlsx(
         sheet_name: str = None,
         sheet_index: int = None,
         date_cols: dict = None,
-        auto_conv_date: bool = False  # 默认格式：'%Y-%m-%d %H:%M:%S'
+        auto_conv_date: bool = False,  # 默认格式：'%Y-%m-%d %H:%M:%S'
+        name_raw: int = 1
 ):
     """
     读取xlsx表格
     :param file: 文件路径
     :param sheet_name: 指定sheet名称，读取指定的sheet
+    :param sheet_index:
     :param date_cols: 按照既定规则转换时间，例如：{'日期': '%Y-%m-%d','时间': '%H:%M:%S'}，就会将表中对应字段转换为对应格式的字符串
     :param auto_conv_date: 自动转换，会将时间类型的数据自动转换为默认格式的字符串
+    :param name_raw: 列名序号，默认为1
 
     :returns: 读取结果字典，字典的第一层key为sheet_name，如果指定了读取哪个sheet，则只返回值list
 
@@ -147,10 +150,10 @@ def read_xlsx(
         row_num = each_sheet.max_row  # 获取行数
         col_num = each_sheet.max_column  # 获取列数
         sheet_data_list = list()
-        for each_row in range(1, row_num):  # 遍历每一行
+        for each_row in range(name_raw, row_num):  # 遍历每一行
             each_row_data = dict()
-            for each_col in range(1, col_num + 1):  # 对于当前行，遍历每一列，将每一行的数据以dict的形式组织到each_row_data里面
-                col_name = each_sheet.cell(1, each_col).value
+            for each_col in range(name_raw, col_num + 1):  # 对于当前行，遍历每一列，将每一行的数据以dict的形式组织到each_row_data里面
+                col_name = each_sheet.cell(name_raw, each_col).value
                 if col_name is None:
                     continue
                 else:
