@@ -326,7 +326,7 @@ def download_driver(
     from lazysdk import lazyfile
     browser_version = get_browser_version()  # 获取浏览器版本
 
-    drivers_directory_version = os.path.join(drivers_directory, browser_version)
+    drivers_directory_version = os.path.join(drivers_directory, browser_version)  # 存放driver的路径
     print("drivers_directory_version:", drivers_directory_version)
     if platform.system() == "Windows":
         driver_dir = os.path.join(drivers_directory_version, "chromedriver.exe")
@@ -356,7 +356,9 @@ def download_driver(
         )  # 解压文件
         print(f"解压后的文件地址：{unpack_archive_files}")
         for each_file in unpack_archive_files:
+            print(each_file)
             if lazyfile.get_file_info(each_file)["name"] in ["chromedriver", "chromedriver.exe"] :
+            # if each_file in ["chromedriver", "chromedriver.exe"]:
                 shutil.copy2(each_file, driver_dir)
                 os.chmod(path=driver_dir, mode=755)
                 return driver_dir
@@ -384,9 +386,10 @@ def unpack_archive(
         target_dir: str = None
 ):
     if archive_file.endswith(".zip"):
-        return lazyfile.unzip(file=archive_file)
+        # return lazyfile.unzip(file=archive_file)
+        return __extract_zip(archive_file=archive_file , to_directory=target_dir)
     elif archive_file.endswith(".tar.gz"):
-        return __extract_tar_file(archive_file, target_dir)
+        return __extract_tar_file(archive_file=archive_file, to_directory=target_dir)
 
 
 def __extract_zip(archive_file, to_directory):
@@ -412,7 +415,15 @@ def __extract_zip(archive_file, to_directory):
                 os.replace(source, destination)
                 file_names.append(file_name)
         return sorted(file_names, key=lambda x: x.lower())
-    return archive.namelist()
+
+    if not to_directory:
+        return archive.namelist()
+    else:
+        file_names = []
+        for n in archive.namelist():
+            full_file_path = os.path.join(to_directory, n)
+            file_names.append(full_file_path)
+        return file_names
 
 
 def __extract_tar_file(archive_file, to_directory):
