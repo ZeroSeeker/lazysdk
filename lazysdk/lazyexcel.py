@@ -128,7 +128,8 @@ def read_xlsx(
     else:
         data_cols_cols = date_cols.keys()
     table_data_dict = OrderedDict()  # 有序字典
-    table_data = openpyxl.load_workbook(file)  # 加载表内容
+    file_clean = file.replace("'", "").replace('"', "").strip()
+    table_data = openpyxl.load_workbook(file_clean)  # 加载表内容
     sheets = table_data.worksheets
     if sheet_name is None and sheet_index is not None:
         target_sheet = sheets[sheet_index].title
