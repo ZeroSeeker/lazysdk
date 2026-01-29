@@ -317,7 +317,9 @@ def find_driver_url(
 #     return Archive(archive_path)
 #
 #
-def download_driver(overwrite: bool = False):
+def download_driver(
+        overwrite: bool = False
+):
     """
     根据当前系统的chrome版本下载对应版本的driver
     """
@@ -330,7 +332,7 @@ def download_driver(overwrite: bool = False):
         driver_dir = os.path.join(drivers_directory_version, "chromedriver.exe")
     else:
         driver_dir = os.path.join(drivers_directory_version, "chromedriver")
-    if os.path.exists(drivers_directory_version):
+    if os.path.exists(driver_dir):
         # 路径已经存在
         return driver_dir
     else:
