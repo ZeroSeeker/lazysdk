@@ -153,7 +153,7 @@ def read_xlsx(
         sheet_data_list = list()
         for each_row in range(name_raw, row_num):  # 遍历每一行
             each_row_data = dict()
-            for each_col in range(name_raw, col_num + 1):  # 对于当前行，遍历每一列，将每一行的数据以dict的形式组织到each_row_data里面
+            for each_col in range(1, col_num + 1):  # 对于当前行，遍历每一列，将每一行的数据以dict的形式组织到each_row_data里面
                 col_name = each_sheet.cell(name_raw, each_col).value
                 if col_name is None:
                     continue
