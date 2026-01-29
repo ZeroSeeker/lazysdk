@@ -338,8 +338,7 @@ def download_driver(
     else:
         # 路径不存在，需要下载
         os.makedirs(drivers_directory_version, exist_ok=True)  # 创建driver下载目录
-
-        driver_download_url = find_driver_url(browser_version=browser_version)
+        driver_download_url = find_driver_url(browser_version=browser_version)  # 驱动url
         # print("driver_download_url:", driver_download_url)
         filename = extract_filename_from_url(driver_download_url)
         # print('filename:', filename)
@@ -349,11 +348,13 @@ def download_driver(
         file = lazyfile.download(
             url=driver_download_url,
             path=drivers_directory_version
-        )['file_dir']
-        # print("file:", file)
+        )['file_dir']  # 下载驱动文件
+        print("下载的文件位置为:", file)
         unpack_archive_files = unpack_archive(
             archive_file=file,
-        )
+            target_dir=drivers_directory_version,
+        )  # 解压文件
+        print(f"解压后的文件地址：{unpack_archive_files}")
         for each_file in unpack_archive_files:
             if lazyfile.get_file_info(each_file)["name"] in ["chromedriver", "chromedriver.exe"] :
                 shutil.copy2(each_file, driver_dir)
